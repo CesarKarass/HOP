@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HOPAPI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bba69c95cab5356f002c7b5cf85156ee49970b8a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+896ea1f378668d87c43c6f43a27df4535c27d436")]
 [assembly: System.Reflection.AssemblyProductAttribute("HOPAPI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HOPAPI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
