@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - HOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --azul-oscuro: #001F3F;
+            --naranja-hop: #fb8c00;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar-custom {
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            padding: 0.5rem 2rem;
+        }
+        .navbar-brand img {
+            height: 45px;
+            width: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .brand-text {
+            color: var(--azul-oscuro);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: #555 !important;
+            margin: 0 10px;
+            font-weight: 500;
+        }
+        .btn-menu {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-radius: 5px;
+            padding: 5px 15px;
+            border: none;
+        }
+        .config-card {
+            background: white;
+            border-radius: 20px;
+            border: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .config-header {
+            background: linear-gradient(135deg, var(--azul-oscuro), #003366);
+            padding: 20px 25px;
+            color: white;
+        }
+        .config-body {
+            padding: 25px;
+        }
+        .config-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .config-item:last-child {
+            border-bottom: none;
+        }
+        .form-switch .form-check-input {
+            width: 50px;
+            height: 25px;
+            cursor: pointer;
+        }
+        .form-switch .form-check-input:checked {
+            background-color: var(--naranja-hop);
+            border-color: var(--naranja-hop);
+        }
+        .btn-guardar {
+            background-color: var(--naranja-hop);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .alert {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="http://localhost:5147/static/images/logohop.jpeg" alt="HOP">
+                <span class="brand-text">HOP</span>
+            </a>
+            <div class="navbar-nav mx-auto">
+                <a class="nav-link" href="/inicio">Inicio</a>
+                <a class="nav-link" href="/">HOP</a>
+                <a class="nav-link" href="/privacidad">Privacidad</a>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-menu shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Menú
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/miperfil"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="/micv"><i class="bi bi-file-text"></i> Mi CV</a></li>
+                    <li><a class="dropdown-item" href="/minegocio"><i class="bi bi-building"></i> Mi Negocio</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/notificaciones"><i class="bi bi-bell"></i> Notificaciones</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item fw-bold" href="/configuracion"><i class="bi bi-gear"></i> Configuración</a></li>
+                    <li><a class="dropdown-item" href="/ayuda"><i class="bi bi-question-circle"></i> Ayuda</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Cerrar Sesión</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        <div class="config-card">
+            <div class="config-header">
+                <h3 class="mb-0"><i class="bi bi-gear-fill me-2"></i>Configuración de Cuenta</h3>
+                <p class="mb-0 opacity-75">Personaliza tu experiencia en HOP</p>
+            </div>
+            <div class="config-body">
+                <form id="configForm">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-bell me-2" style="color: var(--naranja-hop);"></i>Notificaciones</h5>
+                    
+                    <div class="config-item">
+                        <div>
+                            <strong>Notificaciones de mensajes</strong>
+                            <p class="text-muted small mb-0">Recibir alertas cuando te envíen un mensaje</p>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notifMensajes" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div>
+                            <strong>Notificaciones de postulaciones</strong>
+                            <p class="text-muted small mb-0">Alertas cuando alguien se postule a tus servicios</p>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notifPostulaciones" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div>
+                            <strong>Notificaciones de servicios</strong>
+                            <p class="text-muted small mb-0">Alertas sobre nuevos servicios que podrían interesarte</p>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="notifServicios" checked>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-3"><i class="bi bi-shield-lock me-2" style="color: var(--naranja-hop);"></i>Privacidad y Seguridad</h5>
+                    
+                    <div class="config-item">
+                        <div>
+                            <strong>Perfil público</strong>
+                            <p class="text-muted small mb-0">Permitir que otros usuarios vean tu perfil</p>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="perfilPublico" checked>
+                        </div>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div>
+                            <strong>Mostrar teléfono en perfil</strong>
+                            <p class="text-muted small mb-0">Tu número solo visible para usuarios con los que interactúas</p>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="mostrarTelefono">
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mt-4 mb-3"><i class="bi bi-palette me-2" style="color: var(--naranja-hop);"></i>Preferencias</h5>
+                    
+                    <div class="config-item">
+                        <div>
+                            <strong>Idioma</strong>
+                            <p class="text-muted small mb-0">Selecciona tu idioma preferido</p>
+                        </div>
+                        <select class="form-select w-auto" id="idioma">
+                            <option value="es">Español</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    
+                    <div class="config-item">
+                        <div>
+                            <strong>Zona horaria</strong>
+                            <p class="text-muted small mb-0">Configura tu zona horaria</p>
+                        </div>
+                        <select class="form-select w-auto" id="zonaHoraria">
+                            <option value="America/Mexico_City">Ciudad de México</option>
+                            <option value="America/Los_Angeles">Pacific Time</option>
+                            <option value="America/New_York">Eastern Time</option>
+                        </select>
+                    </div>
+
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <button type="button" class="btn btn-outline-danger" id="cambiarPasswordBtn">
+                                <i class="bi bi-key"></i> Cambiar Contraseña
+                            </button>
+                        </div>
+                        <button type="submit" class="btn-guardar">Guardar Cambios</button>
+                    </div>
+                </form>
+                
+                <div class="alert alert-success mt-3" id="successAlert">Configuración guardada correctamente</div>
+                <div class="alert alert-danger mt-3" id="errorAlert"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5147/api';
+        
+        function verificarSesion() {
+            const userStr = localStorage.getItem('hop_usuario');
+            const session = localStorage.getItem('hop_session');
+            if (!userStr || session !== 'active') {
+                window.location.href = '/login';
+                return false;
+            }
+            return true;
+        }
+
+        function cargarConfiguracion() {
+            const config = JSON.parse(localStorage.getItem('hop_configuracion') || '{}');
+            document.getElementById('notifMensajes').checked = config.notifMensajes !== false;
+            document.getElementById('notifPostulaciones').checked = config.notifPostulaciones !== false;
+            document.getElementById('notifServicios').checked = config.notifServicios !== false;
+            document.getElementById('perfilPublico').checked = config.perfilPublico !== false;
+            document.getElementById('mostrarTelefono').checked = config.mostrarTelefono || false;
+            document.getElementById('idioma').value = config.idioma || 'es';
+            document.getElementById('zonaHoraria').value = config.zonaHoraria || 'America/Mexico_City';
+        }
+
+        function guardarConfiguracion() {
+            const config = {
+                notifMensajes: document.getElementById('notifMensajes').checked,
+                notifPostulaciones: document.getElementById('notifPostulaciones').checked,
+                notifServicios: document.getElementById('notifServicios').checked,
+                perfilPublico: document.getElementById('perfilPublico').checked,
+                mostrarTelefono: document.getElementById('mostrarTelefono').checked,
+                idioma: document.getElementById('idioma').value,
+                zonaHoraria: document.getElementById('zonaHoraria').value
+            };
+            
+            localStorage.setItem('hop_configuracion', JSON.stringify(config));
+            
+            const successAlert = document.getElementById('successAlert');
+            successAlert.style.display = 'block';
+            setTimeout(() => { successAlert.style.display = 'none'; }, 3000);
+        }
+
+        document.getElementById('configForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            guardarConfiguracion();
+        });
+
+        document.getElementById('cambiarPasswordBtn').addEventListener('click', () => {
+            alert('Funcionalidad de cambio de contraseña próximamente');
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('hop_session');
+            localStorage.removeItem('hop_usuario');
+            window.location.href = '/';
+        });
+
+        if (verificarSesion()) {
+            cargarConfiguracion();
+        }
+    </script>
+</body>
+</html>
