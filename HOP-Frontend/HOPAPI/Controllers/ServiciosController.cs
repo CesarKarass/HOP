@@ -9,6 +9,7 @@ using System.Linq;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace HOPAPI.Controllers;
 
@@ -75,16 +76,43 @@ public class ServiciosController : ControllerBase
         [FromForm] string Ubicacion,
         [FromForm] int CategoriaID,
         [FromForm] string Descripcion,
+        [FromForm] string OtraCategoria = null,
         IFormFile imagen = null)
     {
         try
         {
+            int categoriaFinalId = CategoriaID;
+            
+            // Si es categoría "Otro" (ID = 0) y se proporcionó un nombre
+            if (CategoriaID == 0 && !string.IsNullOrEmpty(OtraCategoria))
+            {
+                // Verificar si la categoría ya existe
+                SqlParameter[] checkParams = { new SqlParameter("@Nombre", OtraCategoria) };
+                DataTable checkDt = await _db.ExecuteQueryAsync("VerificarCategoriaExistente", checkParams);
+                
+                if (checkDt.Rows.Count > 0)
+                {
+                    categoriaFinalId = Convert.ToInt32(checkDt.Rows[0]["Id"]);
+                }
+                else
+                {
+                    // Crear nueva categoría personalizada
+                    SqlParameter[] insertParams = {
+                        new SqlParameter("@Nombre", OtraCategoria),
+                        new SqlParameter("@UsuarioID", UsuarioID),
+                        new SqlParameter("@EsPersonalizada", 1)
+                    };
+                    DataTable newCatDt = await _db.ExecuteQueryAsync("CrearCategoriaPersonalizada", insertParams);
+                    categoriaFinalId = Convert.ToInt32(newCatDt.Rows[0]["Id"]);
+                }
+            }
+            
             string imagenUrl = "/static/images/vacante.jpg";
             
             if (imagen != null && imagen.Length > 0)
             {
                 var extension = Path.GetExtension(imagen.FileName).ToLower();
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
                 
@@ -103,16 +131,114 @@ public class ServiciosController : ControllerBase
                 new SqlParameter("@Titulo", Titulo),
                 new SqlParameter("@UsuarioID", UsuarioID),
                 new SqlParameter("@Ubicacion", Ubicacion),
-                new SqlParameter("@CategoriaID", CategoriaID),
+                new SqlParameter("@CategoriaID", categoriaFinalId),
                 new SqlParameter("@Descripcion", Descripcion ?? ""),
                 new SqlParameter("@ImagenURL", imagenUrl)
             };
-            await _db.ExecuteNonQueryAsync("CrearServicio", p);
-            return Ok(new { mensaje = "Servicio publicado exitosamente", imagenUrl = imagenUrl });
+            
+            DataTable result = await _db.ExecuteQueryAsync("CrearServicioConId", p);
+            int servicioId = Convert.ToInt32(result.Rows[0]["Id"]);
+            
+            return Ok(new { mensaje = "Servicio publicado exitosamente", imagenUrl = imagenUrl, id = servicioId });
         }
         catch (Exception ex)
         {
             return StatusCode(500, new { error = ex.Message });
+        }
+    }
+
+    [HttpPost("subir-imagenes/{servicioId}")]
+    public async Task<IActionResult> SubirImagenes(int servicioId, List<IFormFile> imagenes)
+    {
+        try
+        {
+            var imagenesUrls = new List<string>();
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "servicios", servicioId.ToString());
+            
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+            
+            int orden = 0;
+            foreach (var imagen in imagenes)
+            {
+                if (imagen.Length > 0)
+                {
+                    var fileName = $"{DateTime.Now.Ticks}_{orden}_{imagen.FileName}";
+                    var filePath = Path.Combine(uploadsFolder, fileName);
+                    
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await imagen.CopyToAsync(stream);
+                    }
+                    
+                    var imagenUrl = $"/uploads/servicios/{servicioId}/{fileName}";
+                    imagenesUrls.Add(imagenUrl);
+                    
+                    SqlParameter[] p = {
+                        new SqlParameter("@ServicioId", servicioId),
+                        new SqlParameter("@ImagenUrl", imagenUrl),
+                        new SqlParameter("@Orden", orden)
+                    };
+                    await _db.ExecuteNonQueryAsync("InsertarImagenServicio", p);
+                    orden++;
+                }
+            }
+            
+            return Ok(new { mensaje = "Imágenes subidas correctamente", imagenes = imagenesUrls });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpGet("imagenes/{servicioId}")]
+    public async Task<IActionResult> GetImagenesServicio(int servicioId)
+    {
+        try
+        {
+            SqlParameter[] p = { new SqlParameter("@ServicioId", servicioId) };
+            DataTable dt = await _db.ExecuteQueryAsync("ObtenerImagenesServicio", p);
+            
+            var imagenes = dt.AsEnumerable().Select(row => new
+            {
+                Id = row.Field<int>("Id"),
+                ImagenUrl = row.Field<string>("ImagenUrl"),
+                Orden = row.Field<int>("Orden")
+            }).ToList();
+            
+            return Ok(imagenes);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpDelete("imagenes/{imagenId}")]
+    public async Task<IActionResult> EliminarImagen(int imagenId)
+    {
+        try
+        {
+            SqlParameter[] pGet = { new SqlParameter("@ImagenId", imagenId) };
+            DataTable dt = await _db.ExecuteQueryAsync("ObtenerImagenPorId", pGet);
+            
+            if (dt.Rows.Count > 0)
+            {
+                string imagenUrl = dt.Rows[0]["ImagenUrl"].ToString();
+                var filePath = Path.Combine(_env.WebRootPath, imagenUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                    System.IO.File.Delete(filePath);
+            }
+            
+            SqlParameter[] p = { new SqlParameter("@ImagenId", imagenId) };
+            await _db.ExecuteNonQueryAsync("EliminarImagenServicio", p);
+            
+            return Ok(new { mensaje = "Imagen eliminada correctamente" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
         }
     }
 
@@ -132,7 +258,7 @@ public class ServiciosController : ControllerBase
             if (imagen != null && imagen.Length > 0)
             {
                 var extension = Path.GetExtension(imagen.FileName).ToLower();
-                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
                 
@@ -169,6 +295,11 @@ public class ServiciosController : ControllerBase
     {
         try
         {
+            // Eliminar imágenes de la carpeta primero
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "servicios", id.ToString());
+            if (Directory.Exists(uploadsFolder))
+                Directory.Delete(uploadsFolder, true);
+            
             SqlParameter[] p = { new SqlParameter("@Id", id) };
             await _db.ExecuteNonQueryAsync("EliminarServicio", p);
             return Ok(new { mensaje = "Servicio eliminado exitosamente" });
@@ -194,6 +325,35 @@ public class ServiciosController : ControllerBase
         catch (Exception ex) 
         { 
             return BadRequest(new { error = ex.Message }); 
+        }
+    }
+
+    [HttpGet("mis-servicios/{usuarioId}")]
+    public async Task<IActionResult> GetMisServicios(int usuarioId)
+    {
+        try
+        {
+            SqlParameter[] p = { new SqlParameter("@UsuarioID", usuarioId) };
+            DataTable dt = await _db.ExecuteQueryAsync("ObtenerServiciosPorUsuario", p);
+
+            var lista = dt.AsEnumerable().Select(row => new ServicioAlertaDto
+            {
+                Id = row.Field<int>("Id"),
+                Titulo = row.Field<string>("Titulo") ?? "",
+                Ubicacion = row.Field<string>("Ubicacion") ?? "",
+                Categoria = row.Field<string>("Categoria") ?? "",
+                Autor = row.Field<string>("Autor") ?? "",
+                FechaRegistro = row.Field<DateTime>("FechaRegistro"),
+                Descripcion = row.Field<string>("Descripcion") ?? "",
+                UsuarioId = row.Field<int>("UsuarioID"),
+                ImagenURL = row.Field<string>("ImagenURL") ?? "/static/images/vacante.jpg"
+            }).ToList();
+
+            return Ok(lista);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
         }
     }
 }

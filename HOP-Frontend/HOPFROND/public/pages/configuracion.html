@@ -90,6 +90,108 @@
         .alert {
             display: none;
         }
+        /* Modal de cambio de contraseña */
+        .password-modal .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        .password-modal .modal-header {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        .password-modal .form-control:focus {
+            border-color: var(--naranja-hop);
+            box-shadow: 0 0 0 0.2rem rgba(251, 140, 0, 0.25);
+        }
+        .btn-cambiar {
+            background-color: var(--naranja-hop);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .btn-cambiar:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        /* Modal de eliminar cuenta */
+        .delete-modal .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        .delete-modal .modal-header {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        .delete-modal .form-control:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        .btn-eliminar-cuenta {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .btn-eliminar-cuenta:hover {
+            background-color: #c82333;
+        }
+        .btn-eliminar-cuenta:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .warning-text {
+            color: #dc3545;
+            font-size: 0.85rem;
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast-success {
+            background-color: #28a745;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast-error {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 10px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast-warning {
+            background-color: #ffc107;
+            color: #333;
+            border-radius: 10px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast-notification i {
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        .separator {
+            margin: 25px 0;
+            border-top: 1px solid #dee2e6;
+        }
     </style>
 </head>
 <body>
@@ -124,11 +226,13 @@
         </div>
     </nav>
 
+    <!-- Toast de notificacion -->
+    <div id="toastNotification" class="toast-notification"></div>
+
     <div class="container py-4">
         <div class="config-card">
             <div class="config-header">
                 <h3 class="mb-0"><i class="bi bi-gear-fill me-2"></i>Configuración de Cuenta</h3>
-                <p class="mb-0 opacity-75">Personaliza tu experiencia en HOP</p>
             </div>
             <div class="config-body">
                 <form id="configForm">
@@ -151,16 +255,6 @@
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="notifPostulaciones" checked>
-                        </div>
-                    </div>
-                    
-                    <div class="config-item">
-                        <div>
-                            <strong>Notificaciones de servicios</strong>
-                            <p class="text-muted small mb-0">Alertas sobre nuevos servicios que podrían interesarte</p>
-                        </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="notifServicios" checked>
                         </div>
                     </div>
 
@@ -195,7 +289,6 @@
                         </div>
                         <select class="form-select w-auto" id="idioma">
                             <option value="es">Español</option>
-                            <option value="en">English</option>
                         </select>
                     </div>
                     
@@ -222,9 +315,101 @@
                         <button type="submit" class="btn-guardar">Guardar Cambios</button>
                     </div>
                 </form>
+
+                <div class="separator"></div>
+
+                <!-- Sección de Zona Peligrosa -->
+                <div class="mt-4">
+                    <h5 class="fw-bold mb-3" style="color: #e40334;">Eliminar Cuenta</h5>
+                    <div class="config-item">
+                        <div>
+                            <strong>Eliminar cuenta permanentemente</strong>
+                            <p class="text-muted small mb-0">Esta acción eliminará todos tus datos, servicios, mensajes y CVs. No se puede deshacer.</p>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-danger" id="eliminarCuentaBtn">
+                                <i class="bi bi-trash-fill"></i> Eliminar mi cuenta
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="alert alert-success mt-3" id="successAlert">Configuración guardada correctamente</div>
                 <div class="alert alert-danger mt-3" id="errorAlert"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para cambiar contraseña -->
+    <div class="modal fade password-modal" id="cambiarPasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-key-fill"></i> Cambiar Contraseña</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="cambiarPasswordForm">
+                        <div class="mb-3">
+                            <label for="passwordActual" class="form-label fw-bold">Contraseña actual</label>
+                            <input type="password" class="form-control" id="passwordActual" placeholder="Ingresa tu contraseña actual" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nuevaPassword" class="form-label fw-bold">Nueva contraseña</label>
+                            <input type="password" class="form-control" id="nuevaPassword" placeholder="Mínimo 4 caracteres" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmarPassword" class="form-label fw-bold">Confirmar nueva contraseña</label>
+                            <input type="password" class="form-control" id="confirmarPassword" placeholder="Repite la nueva contraseña" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-cambiar" id="confirmarCambioPasswordBtn">
+                        <i class="bi bi-check-circle"></i> Cambiar Contraseña
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para confirmar eliminación de cuenta -->
+    <div class="modal fade delete-modal" id="eliminarCuentaModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> ¡Atención! Eliminar cuenta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-trash-fill" style="font-size: 4rem; color: #dc3545;"></i>
+                    </div>
+                    <p class="fw-bold text-center">¿Estás absolutamente seguro de que deseas eliminar tu cuenta?</p>
+                    <p class="text-muted text-center">Esta acción es <strong class="text-danger">IRREVERSIBLE</strong> y eliminará permanentemente:</p>
+                    <ul class="text-muted">
+                        <li>Tu perfil y toda tu información personal</li>
+                        <li>Todos tus servicios publicados</li>
+                        <li>Tus mensajes y conversaciones</li>
+                        <li>Tus CVs y documentos subidos</li>
+                        <li>Tus calificaciones y postulaciones</li>
+                    </ul>
+                    <div class="alert alert-danger mt-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Esta acción no se puede deshacer.</strong>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label class="form-label fw-bold">Para confirmar, escribe tu correo electrónico:</label>
+                        <input type="email" class="form-control" id="confirmarEmail" placeholder="tu@correo.com">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-eliminar-cuenta" id="confirmarEliminarCuentaBtn" disabled>
+                        <i class="bi bi-trash-fill"></i> Sí, eliminar mi cuenta permanentemente
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -233,6 +418,23 @@
     <script>
         const API_BASE = 'http://localhost:5147/api';
         
+        let usuarioActual = null;
+        let confirmarEmailTimeout = null;
+
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            const toastDiv = document.getElementById('toastNotification');
+            toastDiv.innerHTML = `
+                <div class="toast-${tipo}">
+                    <i class="bi ${tipo === 'success' ? 'bi-check-circle-fill' : (tipo === 'error' ? 'bi-x-circle-fill' : 'bi-exclamation-triangle-fill')}"></i>
+                    ${mensaje}
+                </div>
+            `;
+            toastDiv.classList.add('show');
+            setTimeout(() => {
+                toastDiv.classList.remove('show');
+            }, 3000);
+        }
+
         function verificarSesion() {
             const userStr = localStorage.getItem('hop_usuario');
             const session = localStorage.getItem('hop_session');
@@ -240,6 +442,7 @@
                 window.location.href = '/login';
                 return false;
             }
+            usuarioActual = JSON.parse(userStr);
             return true;
         }
 
@@ -247,7 +450,6 @@
             const config = JSON.parse(localStorage.getItem('hop_configuracion') || '{}');
             document.getElementById('notifMensajes').checked = config.notifMensajes !== false;
             document.getElementById('notifPostulaciones').checked = config.notifPostulaciones !== false;
-            document.getElementById('notifServicios').checked = config.notifServicios !== false;
             document.getElementById('perfilPublico').checked = config.perfilPublico !== false;
             document.getElementById('mostrarTelefono').checked = config.mostrarTelefono || false;
             document.getElementById('idioma').value = config.idioma || 'es';
@@ -258,7 +460,6 @@
             const config = {
                 notifMensajes: document.getElementById('notifMensajes').checked,
                 notifPostulaciones: document.getElementById('notifPostulaciones').checked,
-                notifServicios: document.getElementById('notifServicios').checked,
                 perfilPublico: document.getElementById('perfilPublico').checked,
                 mostrarTelefono: document.getElementById('mostrarTelefono').checked,
                 idioma: document.getElementById('idioma').value,
@@ -272,14 +473,150 @@
             setTimeout(() => { successAlert.style.display = 'none'; }, 3000);
         }
 
+        async function cambiarPassword() {
+            const passwordActual = document.getElementById('passwordActual').value;
+            const nuevaPassword = document.getElementById('nuevaPassword').value;
+            const confirmarPassword = document.getElementById('confirmarPassword').value;
+            
+            if (!passwordActual || !nuevaPassword || !confirmarPassword) {
+                mostrarNotificacion('Todos los campos son obligatorios', 'warning');
+                return;
+            }
+            
+            if (nuevaPassword.length < 4) {
+                mostrarNotificacion('La nueva contraseña debe tener al menos 4 caracteres', 'warning');
+                return;
+            }
+            
+            if (nuevaPassword !== confirmarPassword) {
+                mostrarNotificacion('Las contraseñas no coinciden', 'warning');
+                return;
+            }
+            
+            if (nuevaPassword === passwordActual) {
+                mostrarNotificacion('La nueva contraseña debe ser diferente a la actual', 'warning');
+                return;
+            }
+            
+            const btn = document.getElementById('confirmarCambioPasswordBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Procesando...';
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('usuarioId', usuarioActual.id);
+                formData.append('passwordActual', passwordActual);
+                formData.append('nuevaPassword', nuevaPassword);
+                formData.append('confirmarPassword', confirmarPassword);
+                
+                const response = await fetch(`${API_BASE}/Usuarios/cambiar-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('cambiarPasswordModal')).hide();
+                    mostrarNotificacion('✓ Contraseña actualizada correctamente', 'success');
+                    document.getElementById('cambiarPasswordForm').reset();
+                } else {
+                    mostrarNotificacion(data.error || 'Error al cambiar la contraseña', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error de conexión. Intenta nuevamente.', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle"></i> Cambiar Contraseña';
+            }
+        }
+
+        async function eliminarCuenta() {
+            const btn = document.getElementById('confirmarEliminarCuentaBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Eliminando...';
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('usuarioId', usuarioActual.id);
+                
+                const response = await fetch(`${API_BASE}/Usuarios/eliminar-cuenta`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Limpiar localStorage
+                    localStorage.removeItem('hop_session');
+                    localStorage.removeItem('hop_usuario');
+                    localStorage.removeItem('hop_usuario_temp');
+                    localStorage.removeItem('hop_configuracion');
+                    
+                    mostrarNotificacion('Cuenta eliminada correctamente. Serás redirigido...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    mostrarNotificacion(data.error || 'Error al eliminar la cuenta', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-trash-fill"></i> Sí, eliminar mi cuenta permanentemente';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error de conexión. Intenta nuevamente.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-trash-fill"></i> Sí, eliminar mi cuenta permanentemente';
+            }
+        }
+
+        // Event Listeners
         document.getElementById('configForm').addEventListener('submit', (e) => {
             e.preventDefault();
             guardarConfiguracion();
         });
 
         document.getElementById('cambiarPasswordBtn').addEventListener('click', () => {
-            alert('Funcionalidad de cambio de contraseña próximamente');
+            document.getElementById('cambiarPasswordForm').reset();
+            const modal = new bootstrap.Modal(document.getElementById('cambiarPasswordModal'));
+            modal.show();
         });
+
+        document.getElementById('confirmarCambioPasswordBtn').addEventListener('click', cambiarPassword);
+
+        document.getElementById('confirmarPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                cambiarPassword();
+            }
+        });
+
+        // Botón para abrir modal de eliminar cuenta
+        document.getElementById('eliminarCuentaBtn').addEventListener('click', () => {
+            document.getElementById('confirmarEmail').value = '';
+            const confirmarBtn = document.getElementById('confirmarEliminarCuentaBtn');
+            confirmarBtn.disabled = true;
+            const modal = new bootstrap.Modal(document.getElementById('eliminarCuentaModal'));
+            modal.show();
+        });
+
+        // Validar email para habilitar botón de eliminar
+        document.getElementById('confirmarEmail').addEventListener('input', function() {
+            const confirmarBtn = document.getElementById('confirmarEliminarCuentaBtn');
+            if (this.value === usuarioActual.email) {
+                confirmarBtn.disabled = false;
+            } else {
+                confirmarBtn.disabled = true;
+            }
+        });
+
+        // Confirmar eliminación de cuenta
+        document.getElementById('confirmarEliminarCuentaBtn').addEventListener('click', eliminarCuenta);
 
         document.getElementById('logoutBtn').addEventListener('click', (e) => {
             e.preventDefault();

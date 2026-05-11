@@ -60,23 +60,35 @@ public class ChatController : ControllerBase
             SqlParameter[] p = { new SqlParameter("@UsuarioID", usuarioId) };
             DataTable dt = await _db.ExecuteQueryAsync("ObtenerNotificaciones", p);
 
-            var lista = dt.AsEnumerable().Select(row => new NotificacionCompletaDto
+            var notificaciones = dt.AsEnumerable().Select(row => new NotificacionCompletaDto
             {
                 Id = Convert.ToInt32(row["Id"]),
                 Contenido = row["Contenido"]?.ToString() ?? "",
                 Tipo = row["Tipo"]?.ToString() ?? "sistema",
                 Leida = row["Leida"] != DBNull.Value && Convert.ToBoolean(row["Leida"]),
                 FechaCreacion = row["FechaCreacion"] != DBNull.Value ? Convert.ToDateTime(row["FechaCreacion"]) : DateTime.Now,
-                ReferenciaId = row["ReferenciaID"] != DBNull.Value ? Convert.ToInt32(row["ReferenciaID"]) : (int?)null,
-                EmisorId = row["EmisorId"] != DBNull.Value ? Convert.ToInt32(row["EmisorId"]) : (int?)null,
-                EmisorNombre = row["EmisorNombre"]?.ToString() ?? "",
-                MensajeContenido = row["MensajeContenido"]?.ToString() ?? "",
-                Puntuacion = row["Puntuacion"] != DBNull.Value ? Convert.ToInt32(row["Puntuacion"]) : (int?)null,
-                ComentarioCalificacion = row["ComentarioCalificacion"]?.ToString() ?? "",
-                CalificadorNombre = row["CalificadorNombre"]?.ToString() ?? ""
+                ReferenciaId = row["ReferenciaID"] != DBNull.Value ? Convert.ToInt32(row["ReferenciaID"]) : (int?)null
             }).ToList();
-
-            return Ok(lista);
+            
+            // Agregar postulaciones recibidas (si el usuario es dueño de servicios)
+            SqlParameter[] p2 = { new SqlParameter("@UsuarioID", usuarioId) };
+            DataTable dtPostulaciones = await _db.ExecuteQueryAsync("ObtenerPostulacionesRecibidas", p2);
+            
+            var postulacionesNotif = dtPostulaciones.AsEnumerable().Select(row => new NotificacionCompletaDto
+            {
+                Id = Convert.ToInt32(row["Id"]) + 100000,
+                Contenido = $"Nueva postulación de {row["PrestadorNombre"]} para '{row["ServicioTitulo"]}'",
+                Tipo = "postulacion",
+                Leida = row["Leida"] != DBNull.Value && Convert.ToBoolean(row["Leida"]),
+                FechaCreacion = Convert.ToDateTime(row["FechaPostulacion"]),
+                ReferenciaId = Convert.ToInt32(row["Id"])
+            }).ToList();
+            
+            var todas = notificaciones.Concat(postulacionesNotif)
+                .OrderByDescending(n => n.FechaCreacion)
+                .ToList();
+            
+            return Ok(todas);
         }
         catch (Exception ex)
         {
@@ -162,7 +174,6 @@ public class ChatController : ControllerBase
         }
     }
 
-    // NUEVO ENDPOINT: Marcar calificación como leída
     [HttpPut("marcar-calificacion-leida/{calificacionId}")]
     public async Task<IActionResult> MarcarCalificacionLeida(int calificacionId)
     {
@@ -179,7 +190,6 @@ public class ChatController : ControllerBase
     }
 }
 
-// DTO completo para notificaciones
 public class NotificacionCompletaDto
 {
     public int Id { get; set; }

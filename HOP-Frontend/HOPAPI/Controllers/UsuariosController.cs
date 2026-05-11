@@ -13,6 +13,9 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Google.Apis.Auth;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace HOPAPI.Controllers
 {
@@ -46,7 +49,6 @@ namespace HOPAPI.Controllers
             try
             {
                 Console.WriteLine("=== GOOGLE LOGIN START ===");
-                Console.WriteLine($"Token recibido (primeros 50 chars): {request.Token.Substring(0, Math.Min(50, request.Token.Length))}...");
                 
                 var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token);
                 
@@ -69,12 +71,8 @@ namespace HOPAPI.Controllers
                 }
 
                 DataRow row = dt.Rows[0];
-                Console.WriteLine($"Usuario encontrado/creado - ID: {row["Id"]}, Email: {row["Email"]}");
-
                 var tokenPropio = GenerarTokenJWT(row);
 
-                Console.WriteLine("=== GOOGLE LOGIN SUCCESS ===");
-                
                 return Ok(new
                 {
                     token = tokenPropio,
@@ -95,12 +93,10 @@ namespace HOPAPI.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"ERROR Exception: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
                 return BadRequest(new { mensaje = "Error al procesar el login con Google", error = ex.Message });
             }
         }
 
-        // NUEVO ENDPOINT: Recibe el token como form-urlencoded (para compatibilidad con el frontend)
         [HttpPost("google-login-alt")]
         public async Task<IActionResult> GoogleLoginAlt([FromForm] string token)
         {
@@ -110,7 +106,6 @@ namespace HOPAPI.Controllers
             try
             {
                 Console.WriteLine("=== GOOGLE LOGIN ALT START ===");
-                Console.WriteLine($"Token recibido length: {token.Length}");
                 
                 var payload = await GoogleJsonWebSignature.ValidateAsync(token);
                 
@@ -127,18 +122,11 @@ namespace HOPAPI.Controllers
                 DataTable dt = await _db.ExecuteQueryAsync("UpsertUsuarioGoogle", p);
 
                 if (dt == null || dt.Rows.Count == 0)
-                {
-                    Console.WriteLine("ERROR: No se encontraron datos del usuario en la BD");
                     return BadRequest(new { mensaje = "Error al procesar el usuario en la base de datos" });
-                }
 
                 DataRow row = dt.Rows[0];
-                Console.WriteLine($"Usuario encontrado/creado - ID: {row["Id"]}, Email: {row["Email"]}");
-
                 var tokenPropio = GenerarTokenJWT(row);
 
-                Console.WriteLine("=== GOOGLE LOGIN ALT SUCCESS ===");
-                
                 return Ok(new
                 {
                     token = tokenPropio,
@@ -151,52 +139,10 @@ namespace HOPAPI.Controllers
                     }
                 });
             }
-            catch (InvalidJwtException ex)
-            {
-                Console.WriteLine($"ERROR InvalidJwtException: {ex.Message}");
-                return BadRequest(new { mensaje = "Token de Google inválido", error = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ERROR Exception: {ex.Message}");
-                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
-                return BadRequest(new { mensaje = "Error al procesar el login con Google", error = ex.Message });
-            }
-        }
-
-        // Endpoint de depuración para Google Login
-        [HttpPost("google-login-debug")]
-        public async Task<IActionResult> GoogleLoginDebug([FromBody] GoogleLoginRequest request)
-        {
-            if (request == null || string.IsNullOrEmpty(request.Token))
-                return BadRequest(new { mensaje = "El token es requerido", success = false });
-
-            try
-            {
-                Console.WriteLine("=== GOOGLE LOGIN DEBUG START ===");
-                
-                var payload = await GoogleJsonWebSignature.ValidateAsync(request.Token);
-                
-                Console.WriteLine($"Email: {payload.Email}");
-                Console.WriteLine($"Name: {payload.Name}");
-                
-                return Ok(new { 
-                    success = true,
-                    email = payload.Email,
-                    name = payload.Name,
-                    givenName = payload.GivenName,
-                    familyName = payload.FamilyName,
-                    picture = payload.Picture
-                });
-            }
             catch (Exception ex)
             {
                 Console.WriteLine($"ERROR: {ex.Message}");
-                return BadRequest(new { 
-                    success = false, 
-                    mensaje = "Error al validar token de Google", 
-                    error = ex.Message
-                });
+                return BadRequest(new { mensaje = "Error al procesar el login con Google", error = ex.Message });
             }
         }
 
@@ -208,7 +154,6 @@ namespace HOPAPI.Controllers
                 return BadRequest(new { error = "Datos de usuario no proporcionados" });
             }
 
-            // Validar que el email no esté ya registrado
             SqlParameter[] checkParams = {
                 new SqlParameter("@Email", usuario.Email)
             };
@@ -233,64 +178,30 @@ namespace HOPAPI.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromForm] string email, [FromForm] string password)
         {
-            try
+            SqlParameter[] p = { 
+                new SqlParameter("@Email", email), 
+                new SqlParameter("@Password", password) 
+            };
+            DataTable dt = await _db.ExecuteQueryAsync("Login", p);
+            
+            if (dt.Rows.Count == 0) 
+                return Unauthorized(new { error = "Correo o contraseña incorrectos" });
+
+            DataRow row = dt.Rows[0];
+            var user = new UsuarioLoginResult {
+                Id = (int)row["id"],
+                Name = row["name"].ToString()!,
+                Rol = row["Rol"].ToString()!,
+                NombreCompleto = row["NombreCompleto"].ToString()!
+            };
+
+            var token = GenerarTokenJWT(row);
+
+            return Ok(new
             {
-                Console.WriteLine($"=== LOGIN NORMAL ===");
-                Console.WriteLine($"Email: '{email}'");
-                Console.WriteLine($"Password: '{password}'");
-                
-                // Primero verificar si el email existe
-                SqlParameter[] checkParams = { new SqlParameter("@Email", email) };
-                DataTable checkDt = await _db.ExecuteQueryAsync("VerificarEmailExistente", checkParams);
-                bool emailExiste = checkDt.Rows.Count > 0 && Convert.ToInt32(checkDt.Rows[0]["Existe"]) > 0;
-                
-                if (!emailExiste)
-                {
-                    Console.WriteLine("El email NO existe en la base de datos");
-                    return Unauthorized(new { error = "Correo no registrado" });
-                }
-                
-                Console.WriteLine("Email existe, verificando contraseña...");
-                
-                // Ahora buscar con email y contraseña
-                SqlParameter[] p = { 
-                    new SqlParameter("@Email", email), 
-                    new SqlParameter("@Password", password) 
-                };
-                DataTable dt = await _db.ExecuteQueryAsync("Login", p);
-                
-                Console.WriteLine($"Filas encontradas: {dt.Rows.Count}");
-                
-                if (dt.Rows.Count == 0) 
-                {
-                    Console.WriteLine("Contraseña incorrecta");
-                    return Unauthorized(new { error = "Contraseña incorrecta" });
-                }
-
-                DataRow row = dt.Rows[0];
-                var user = new UsuarioLoginResult {
-                    Id = (int)row["id"],
-                    Name = row["name"].ToString()!,
-                    Rol = row["Rol"].ToString()!,
-                    NombreCompleto = row["NombreCompleto"].ToString()!
-                };
-
-                var token = GenerarTokenJWT(row);
-                
-                Console.WriteLine($"Login exitoso - Usuario ID: {user.Id}, Nombre: {user.Name}");
-
-                return Ok(new
-                {
-                    token = token,
-                    user = user
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ERROR en login: {ex.Message}");
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
-                return StatusCode(500, new { error = "Error interno del servidor", detalle = ex.Message });
-            }
+                token = token,
+                user = user
+            });
         }
 
         [HttpPut("perfil")]
@@ -376,6 +287,237 @@ namespace HOPAPI.Controllers
             };
             
             return Ok(perfil);
+        }
+
+        // ============================================
+        // MÉTODOS PARA GESTIÓN DE CVs
+        // ============================================
+
+        [HttpPost("subir-cv")]
+        public async Task<IActionResult> SubirCV([FromForm] int usuarioId, [FromForm] string titulo, IFormFile archivo)
+        {
+            try
+            {
+                if (archivo == null || archivo.Length == 0)
+                    return BadRequest(new { error = "No se seleccionó ningún archivo" });
+                
+                var extension = Path.GetExtension(archivo.FileName).ToLower();
+                if (extension != ".pdf" && extension != ".docx" && extension != ".doc")
+                    return BadRequest(new { error = "Solo se permiten archivos PDF, DOC o DOCX" });
+                
+                if (archivo.Length > 8 * 1024 * 1024)
+                    return BadRequest(new { error = "El archivo no puede superar los 8MB" });
+                
+                var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "cvs", usuarioId.ToString());
+                if (!Directory.Exists(uploadsFolder))
+                    Directory.CreateDirectory(uploadsFolder);
+                
+                var uniqueFileName = $"{DateTime.Now.Ticks}_{archivo.FileName}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await archivo.CopyToAsync(stream);
+                }
+                
+                var rutaArchivo = $"/uploads/cvs/{usuarioId}/{uniqueFileName}";
+                var tituloFinal = string.IsNullOrEmpty(titulo) ? archivo.FileName : titulo;
+                
+                SqlParameter[] p = {
+                    new SqlParameter("@UsuarioId", usuarioId),
+                    new SqlParameter("@Titulo", tituloFinal),
+                    new SqlParameter("@NombreArchivo", archivo.FileName),
+                    new SqlParameter("@RutaArchivo", rutaArchivo),
+                    new SqlParameter("@Tamano", archivo.Length)
+                };
+                
+                await _db.ExecuteNonQueryAsync("InsertarCV", p);
+                
+                return Ok(new { mensaje = "CV subido correctamente", archivo = rutaArchivo });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("mis-cvs/{usuarioId}")]
+        public async Task<IActionResult> GetMisCVs(int usuarioId)
+        {
+            try
+            {
+                SqlParameter[] p = { new SqlParameter("@UsuarioId", usuarioId) };
+                DataTable dt = await _db.ExecuteQueryAsync("ObtenerCVsUsuario", p);
+                
+                var lista = dt.AsEnumerable().Select(row => new
+                {
+                    Id = row.Field<int>("Id"),
+                    Titulo = row.Field<string>("Titulo"),
+                    NombreArchivo = row.Field<string>("NombreArchivo"),
+                    RutaArchivo = row.Field<string>("RutaArchivo"),
+                    Tamano = row.Field<int>("Tamano"),
+                    FechaSubida = row.Field<DateTime>("FechaSubida")
+                }).ToList();
+                
+                return Ok(lista);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpDelete("eliminar-cv/{cvId}")]
+        public async Task<IActionResult> EliminarCV(int cvId)
+        {
+            try
+            {
+                SqlParameter[] pGet = { new SqlParameter("@CvId", cvId) };
+                DataTable dt = await _db.ExecuteQueryAsync("ObtenerCVPorId", pGet);
+                
+                if (dt.Rows.Count > 0)
+                {
+                    string rutaArchivo = dt.Rows[0]["RutaArchivo"].ToString();
+                    var filePath = Path.Combine(_env.WebRootPath, rutaArchivo.TrimStart('/'));
+                    if (System.IO.File.Exists(filePath))
+                        System.IO.File.Delete(filePath);
+                }
+                
+                SqlParameter[] p = { new SqlParameter("@CvId", cvId) };
+                await _db.ExecuteNonQueryAsync("EliminarCV", p);
+                
+                return Ok(new { mensaje = "CV eliminado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpPut("editar-titulo-cv")]
+        public async Task<IActionResult> EditarTituloCV([FromForm] int cvId, [FromForm] string nuevoTitulo)
+        {
+            try
+            {
+                SqlParameter[] p = {
+                    new SqlParameter("@CvId", cvId),
+                    new SqlParameter("@NuevoTitulo", nuevoTitulo)
+                };
+                await _db.ExecuteNonQueryAsync("EditarTituloCV", p);
+                return Ok(new { mensaje = "Título actualizado correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        // ============================================
+        // MÉTODO PARA CAMBIAR CONTRASEÑA
+        // ============================================
+
+        [HttpPost("cambiar-password")]
+        public async Task<IActionResult> CambiarPassword([FromForm] int usuarioId, [FromForm] string passwordActual, [FromForm] string nuevaPassword, [FromForm] string confirmarPassword)
+        {
+            if (string.IsNullOrEmpty(passwordActual) || string.IsNullOrEmpty(nuevaPassword))
+            {
+                return BadRequest(new { error = "Todos los campos son obligatorios" });
+            }
+            
+            if (nuevaPassword.Length < 4)
+            {
+                return BadRequest(new { error = "La nueva contraseña debe tener al menos 4 caracteres" });
+            }
+            
+            if (nuevaPassword != confirmarPassword)
+            {
+                return BadRequest(new { error = "Las contraseñas no coinciden" });
+            }
+            
+            if (nuevaPassword == passwordActual)
+            {
+                return BadRequest(new { error = "La nueva contraseña debe ser diferente a la actual" });
+            }
+            
+            SqlParameter[] p = {
+                new SqlParameter("@UsuarioID", usuarioId),
+                new SqlParameter("@PasswordActual", passwordActual),
+                new SqlParameter("@NuevaPassword", nuevaPassword)
+            };
+            
+            DataTable dt = await _db.ExecuteQueryAsync("CambiarPassword", p);
+            
+            if (dt.Rows.Count > 0 && dt.Rows[0]["Exito"] != DBNull.Value && Convert.ToBoolean(dt.Rows[0]["Exito"]))
+            {
+                return Ok(new { mensaje = "Contraseña actualizada correctamente" });
+            }
+            else
+            {
+                string error = dt.Rows.Count > 0 ? dt.Rows[0]["Error"]?.ToString() ?? "Error al cambiar contraseña" : "Error al cambiar contraseña";
+                return BadRequest(new { error = error });
+            }
+        }
+
+        // ============================================
+        // MÉTODO PARA ELIMINAR CUENTA
+        // ============================================
+
+        [HttpDelete("eliminar-cuenta")]
+        public async Task<IActionResult> EliminarCuenta([FromForm] int usuarioId)
+        {
+            try
+            {
+                // Verificar que el usuario existe
+                SqlParameter[] checkParams = { new SqlParameter("@UsuarioId", usuarioId) };
+                DataTable checkDt = await _db.ExecuteQueryAsync("VerificarUsuarioExistente", checkParams);
+                
+                if (checkDt.Rows.Count == 0)
+                {
+                    return BadRequest(new { error = "Usuario no encontrado" });
+                }
+                
+                // Primero eliminar los CVs físicos
+                var cvsFolder = Path.Combine(_env.WebRootPath, "uploads", "cvs", usuarioId.ToString());
+                if (Directory.Exists(cvsFolder))
+                {
+                    Directory.Delete(cvsFolder, true);
+                }
+                
+                // Eliminar imágenes de perfil
+                var perfilFolder = Path.Combine(_env.WebRootPath, "uploads", "perfiles");
+                if (Directory.Exists(perfilFolder))
+                {
+                    var archivosPerfil = Directory.GetFiles(perfilFolder, $"user_{usuarioId}_*");
+                    foreach (var archivo in archivosPerfil)
+                    {
+                        System.IO.File.Delete(archivo);
+                    }
+                }
+                
+                // Eliminar imágenes de servicios
+                var serviciosFolder = Path.Combine(_env.WebRootPath, "uploads", "servicios");
+                if (Directory.Exists(serviciosFolder))
+                {
+                    var subcarpetas = Directory.GetDirectories(serviciosFolder);
+                    foreach (var carpeta in subcarpetas)
+                    {
+                        if (carpeta.EndsWith(usuarioId.ToString()))
+                        {
+                            Directory.Delete(carpeta, true);
+                        }
+                    }
+                }
+                
+                // Eliminar usuario (las FK con ON DELETE CASCADE eliminarán los datos relacionados)
+                SqlParameter[] p = { new SqlParameter("@UsuarioId", usuarioId) };
+                await _db.ExecuteNonQueryAsync("EliminarUsuario", p);
+                
+                return Ok(new { mensaje = "Cuenta eliminada correctamente" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+            }
         }
 
         // Método privado para centralizar la creación de Tokens JWT

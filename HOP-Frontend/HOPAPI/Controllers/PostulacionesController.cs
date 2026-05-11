@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using HOPAPI.Data;
-using System;
-using System.Threading.Tasks;
 using System.Data;
-using HOPAPI.Models;
+using System.Threading.Tasks;
+using System;
 using System.Linq;
 
 namespace HOPAPI.Controllers;
@@ -20,62 +19,127 @@ public class PostulacionesController : ControllerBase
         _db = db;
     }
 
-    // POST: api/Postulaciones/aplicar
     [HttpPost("aplicar")]
-    public async Task<IActionResult> Postularse(int servicioId, int prestadorId)
+    public async Task<IActionResult> Aplicar([FromForm] int servicioId, [FromForm] int prestadorId, [FromForm] string mensaje, [FromForm] int cvId)
     {
         try
         {
-            SqlParameter[] parameters = {
+            SqlParameter[] p = {
                 new SqlParameter("@ServicioID", servicioId),
-                new SqlParameter("@PrestadorID", prestadorId)
+                new SqlParameter("@PrestadorID", prestadorId),
+                new SqlParameter("@Mensaje", string.IsNullOrEmpty(mensaje) ? DBNull.Value : (object)mensaje),
+                new SqlParameter("@CvId", cvId)
             };
 
-            // Ejecutamos el SP que creamos antes
-            await _db.ExecuteNonQueryAsync("CrearPostulacion", parameters);
+            DataTable dt = await _db.ExecuteQueryAsync("CrearPostulacion", p);
             
-            return Ok(new { mensaje = "Te has postulado exitosamente al servicio." });
-        }
-        catch (SqlException ex)
-        {
-            // Captura los RAISERROR que pusimos en el SQL (ej: "Ya te has postulado")
-            return BadRequest(new { error = ex.Message });
+            if (dt.Rows.Count > 0 && dt.Rows[0]["Exito"] != DBNull.Value && Convert.ToInt32(dt.Rows[0]["Exito"]) == 1)
+            {
+                return Ok(new { mensaje = dt.Rows[0]["Mensaje"]?.ToString() ?? "Postulación enviada correctamente" });
+            }
+            else
+            {
+                string error = dt.Rows.Count > 0 ? dt.Rows[0]["Mensaje"]?.ToString() ?? "Error al postularse" : "Error al postularse";
+                return BadRequest(new { error = error });
+            }
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { error = "Error interno: " + ex.Message });
+            return StatusCode(500, new { error = ex.Message });
         }
     }
 
-    [HttpGet("servicio/{servicioId}")]
-public async Task<IActionResult> ListarPorServicio(int servicioId)
-{
-    try
+    [HttpGet("recibidas/{usuarioId}")]
+    public async Task<IActionResult> GetPostulacionesRecibidas(int usuarioId)
     {
-        SqlParameter[] parameters = {
-            new SqlParameter("@ServicioID", servicioId)
-        };
-
-        // 1. Ejecutamos el SP con el nombre correcto que tienes en SQL
-        DataTable dt = await _db.ExecuteQueryAsync("ObtenerPostulacionesPorServicio", parameters);
-        
-        // 2. MAPEADO MANUAL (Esto soluciona el error System.NotSupportedException)
-        var lista = dt.AsEnumerable().Select(row => new PostulacionDetalleDto
+        try
         {
-            PostulacionID = Convert.ToInt32(row["PostulacionID"]),
-            Fecha = Convert.ToDateTime(row["fecha"]),
-            Estado = row["estado"]?.ToString() ?? "",
-            UsuarioNombre = row["UsuarioNombre"]?.ToString() ?? "",
-            NombreCompleto = row["NombreCompleto"]?.ToString() ?? "",
-            Telefono = row["Telefono"]?.ToString() ?? "",
-            FotoURL = row["FotoURL"]?.ToString() ?? ""
-        }).ToList();
+            SqlParameter[] p = { new SqlParameter("@UsuarioID", usuarioId) };
+            DataTable dt = await _db.ExecuteQueryAsync("ObtenerPostulacionesRecibidas", p);
+            
+            var lista = dt.AsEnumerable().Select(row => new
+            {
+                Id = Convert.ToInt32(row["Id"]),
+                ServicioId = Convert.ToInt32(row["ServicioID"]),
+                ServicioTitulo = row["ServicioTitulo"]?.ToString() ?? "",
+                PrestadorId = Convert.ToInt32(row["PrestadorID"]),
+                PrestadorNombre = row["PrestadorNombre"]?.ToString() ?? "",
+                Mensaje = row["Mensaje"]?.ToString() ?? "",
+                Estado = row["Estado"]?.ToString() ?? "",
+                FechaPostulacion = Convert.ToDateTime(row["FechaPostulacion"]),
+                Leida = row["Leida"] != DBNull.Value && Convert.ToBoolean(row["Leida"]),
+                CvId = row["CvId"] != DBNull.Value ? Convert.ToInt32(row["CvId"]) : (int?)null,
+                CvRuta = row["CvRuta"]?.ToString() ?? "",
+                CvNombre = row["CvNombre"]?.ToString() ?? ""
+            }).ToList();
+            
+            return Ok(lista);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
 
-        return Ok(lista);
-    }
-    catch (Exception ex)
+    [HttpGet("mis-postulaciones/{prestadorId}")]
+    public async Task<IActionResult> GetMisPostulaciones(int prestadorId)
     {
-        return BadRequest(new { error = "Error al obtener postulaciones", detalle = ex.Message });
+        try
+        {
+            SqlParameter[] p = { new SqlParameter("@PrestadorID", prestadorId) };
+            DataTable dt = await _db.ExecuteQueryAsync("ObtenerMisPostulaciones", p);
+            
+            var lista = dt.AsEnumerable().Select(row => new
+            {
+                Id = Convert.ToInt32(row["Id"]),
+                ServicioId = Convert.ToInt32(row["ServicioID"]),
+                ServicioTitulo = row["ServicioTitulo"]?.ToString() ?? "",
+                AutorId = Convert.ToInt32(row["AutorId"]),
+                AutorNombre = row["AutorNombre"]?.ToString() ?? "",
+                Mensaje = row["Mensaje"]?.ToString() ?? "",
+                Estado = row["Estado"]?.ToString() ?? "",
+                FechaPostulacion = Convert.ToDateTime(row["FechaPostulacion"])
+            }).ToList();
+            
+            return Ok(lista);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
     }
-}
+
+    [HttpPut("actualizar-estado/{postulacionId}")]
+    public async Task<IActionResult> ActualizarEstado(int postulacionId, [FromForm] string estado)
+    {
+        try
+        {
+            SqlParameter[] p = {
+                new SqlParameter("@PostulacionId", postulacionId),
+                new SqlParameter("@Estado", estado)
+            };
+            await _db.ExecuteNonQueryAsync("ActualizarEstadoPostulacion", p);
+            
+            return Ok(new { mensaje = "Estado actualizado correctamente" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpPut("marcar-leida/{postulacionId}")]
+    public async Task<IActionResult> MarcarLeida(int postulacionId)
+    {
+        try
+        {
+            SqlParameter[] p = { new SqlParameter("@PostulacionId", postulacionId) };
+            await _db.ExecuteNonQueryAsync("MarcarPostulacionLeida", p);
+            return Ok(new { mensaje = "Postulación marcada como leída" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
 }

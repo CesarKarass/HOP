@@ -36,7 +36,7 @@ app.get('/api/test', (req, res) => {
     res.json({ message: 'Proxy funcionando correctamente' });
 });
 
-// Rutas para las páginas
+// Rutas para las páginas principales
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'index.html'));
 });
@@ -77,16 +77,33 @@ app.get('/registro_empresa', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'registro_empresa.html'));
 });
 
-app.get('/negocio/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'pages', 'detalle_negocio.html'));
-});
-
 app.get('/notificaciones', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'notificaciones.html'));
 });
 
 app.get('/configuracion', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'pages', 'configuracion.html'));
+});
+
+// Ruta para detalle de negocio (con ID)
+app.get('/negocio/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'pages', 'detalle_negocio.html'));
+});
+
+// RUTAS ALTERNATIVAS PARA COMPATIBILIDAD
+// Redirigir /detalle_negocio a /negocio
+app.get('/detalle_negocio/:id', (req, res) => {
+    res.redirect(`/negocio/${req.params.id}`);
+});
+
+app.get('/detalle_negocio', (req, res) => {
+    res.redirect('/');
+});
+
+// Manejar rutas no encontradas (404)
+app.use((req, res) => {
+    console.log(`[404] Ruta no encontrada: ${req.method} ${req.url}`);
+    res.status(404).sendFile(path.join(__dirname, 'public', 'pages', '404.html'));
 });
 
 // Iniciar servidor
