@@ -3,30 +3,32 @@ const path = require('path');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Servir archivos estáticos
 app.use('/static', express.static(path.join(__dirname, 'public', 'static')));
 
-// Proxy para la API de .NET (redirige /api/* a http://localhost:5147/api/*)
+// Servir archivos subidos (CVs, imágenes, etc.)
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+
+// Proxy para la API de .NET
+// En producción, apunta al puerto donde corre el backend (5000)
+// En desarrollo, usa localhost:5147
+const API_TARGET = process.env.API_TARGET || 'http://localhost:5000';
+
 app.use('/api', createProxyMiddleware({
-    target: 'http://localhost:5147',
+    target: API_TARGET,
     changeOrigin: true,
-    // No reescribir la ruta, mantener /api
-    pathRewrite: {
-        '^/api': '/api'
-    },
-    // Logging para depuración
     logLevel: 'debug',
     onProxyReq: (proxyReq, req, res) => {
-        console.log(`[PROXY] ${req.method} ${req.url} -> http://localhost:5147${req.url}`);
+        console.log(`[PROXY] ${req.method} ${req.url} -> ${API_TARGET}${req.url}`);
     },
     onError: (err, req, res) => {
         console.error('[PROXY ERROR]', err.message);
         res.status(500).json({ 
             error: 'No se pudo conectar con el servidor API', 
             detalle: err.message,
-            sugerencia: 'Verifica que el backend de C# esté corriendo en http://localhost:5147'
+            sugerencia: 'Verifica que el backend de C# esté corriendo'
         });
     }
 }));
@@ -91,7 +93,6 @@ app.get('/negocio/:id', (req, res) => {
 });
 
 // RUTAS ALTERNATIVAS PARA COMPATIBILIDAD
-// Redirigir /detalle_negocio a /negocio
 app.get('/detalle_negocio/:id', (req, res) => {
     res.redirect(`/negocio/${req.params.id}`);
 });
@@ -107,9 +108,9 @@ app.use((req, res) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`\n========================================`);
-    console.log(`Servidor HOP corriendo en http://localhost:${PORT}`);
-    console.log(`Proxy API -> http://localhost:5147/api`);
+    console.log(`Servidor HOP corriendo en http://0.0.0.0:${PORT}`);
+    console.log(`Proxy API -> ${API_TARGET}/api`);
     console.log(`========================================\n`);
 });
