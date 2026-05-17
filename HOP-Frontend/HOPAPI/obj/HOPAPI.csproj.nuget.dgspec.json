@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Sarahi\\Documents\\hopapi\\HOPAPI.csproj": {}
+    "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\HOPAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Sarahi\\Documents\\hopapi\\HOPAPI.csproj": {
+    "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\HOPAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Sarahi\\Documents\\hopapi\\HOPAPI.csproj",
+        "projectUniqueName": "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\HOPAPI.csproj",
         "projectName": "HOPAPI",
-        "projectPath": "C:\\Users\\Sarahi\\Documents\\hopapi\\HOPAPI.csproj",
+        "projectPath": "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\HOPAPI.csproj",
         "packagesPath": "C:\\Users\\Sarahi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Sarahi\\Documents\\hopapi\\obj\\",
+        "outputPath": "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

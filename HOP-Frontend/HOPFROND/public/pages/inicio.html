@@ -124,6 +124,14 @@
             width: 25px;
             margin-right: 8px;
         }
+        .badge-notif {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
 
         /* Estilos para los modales */
         .modal-content {
@@ -175,7 +183,7 @@
                     <i class="bi bi-list"></i> Menú
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
-                     <li><a class="dropdown-item" href="/miperfil"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="/miperfil"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
                     <li><a class="dropdown-item" href="/micv"><i class="bi bi-file-text"></i> Mi CV</a></li>
                     <li><a class="dropdown-item" href="/minegocio"><i class="bi bi-building"></i> Mi Negocio</a></li>
                     <li><hr class="dropdown-divider"></li>
@@ -185,7 +193,8 @@
                     <li><a class="dropdown-item" href="/ayuda"><i class="bi bi-question-circle"></i> Ayuda</a></li>
                     <li><hr class="dropdown-divider"></li>
                     <li><a class="dropdown-item text-danger" href="#" id="logoutMenuItem"><i class="bi bi-box-arrow-right"></i> Cerrar Sesion</a></li>
-                    <li><a class="dropdown-item" href="/login" id="menuLoginItem"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesion</a></li></ul>
+                    <li><a class="dropdown-item" href="/login" id="menuLoginItem"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesion</a></li>
+                </ul>
             </div>
         </div>
     </nav>
@@ -294,11 +303,14 @@
         
         function actualizarMenu() {
             const loginItem = document.getElementById('menuLoginItem');
+            const logoutItem = document.getElementById('logoutMenuItem');
             
             if (sesionActiva && usuarioActual) {
                 if (loginItem) loginItem.style.display = 'none';
+                if (logoutItem) logoutItem.style.display = 'block';
             } else {
                 if (loginItem) loginItem.style.display = 'block';
+                if (logoutItem) logoutItem.style.display = 'none';
             }
         }
         
@@ -377,6 +389,14 @@
                 alert('Por favor escribe tu experiencia profesional');
             }
         }
+        
+        // Cerrar sesión
+        document.getElementById('logoutMenuItem')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('hop_session');
+            localStorage.removeItem('hop_usuario');
+            window.location.href = '/';
+        });
         
         // Event listeners
         document.getElementById('addObjetivo').addEventListener('click', (e) => {

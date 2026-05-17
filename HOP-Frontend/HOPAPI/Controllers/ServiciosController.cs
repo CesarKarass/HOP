@@ -76,37 +76,10 @@ public class ServiciosController : ControllerBase
         [FromForm] string Ubicacion,
         [FromForm] int CategoriaID,
         [FromForm] string Descripcion,
-        [FromForm] string OtraCategoria = null,
         IFormFile imagen = null)
     {
         try
         {
-            int categoriaFinalId = CategoriaID;
-            
-            // Si es categoría "Otro" (ID = 0) y se proporcionó un nombre
-            if (CategoriaID == 0 && !string.IsNullOrEmpty(OtraCategoria))
-            {
-                // Verificar si la categoría ya existe
-                SqlParameter[] checkParams = { new SqlParameter("@Nombre", OtraCategoria) };
-                DataTable checkDt = await _db.ExecuteQueryAsync("VerificarCategoriaExistente", checkParams);
-                
-                if (checkDt.Rows.Count > 0)
-                {
-                    categoriaFinalId = Convert.ToInt32(checkDt.Rows[0]["Id"]);
-                }
-                else
-                {
-                    // Crear nueva categoría personalizada
-                    SqlParameter[] insertParams = {
-                        new SqlParameter("@Nombre", OtraCategoria),
-                        new SqlParameter("@UsuarioID", UsuarioID),
-                        new SqlParameter("@EsPersonalizada", 1)
-                    };
-                    DataTable newCatDt = await _db.ExecuteQueryAsync("CrearCategoriaPersonalizada", insertParams);
-                    categoriaFinalId = Convert.ToInt32(newCatDt.Rows[0]["Id"]);
-                }
-            }
-            
             string imagenUrl = "/static/images/vacante.jpg";
             
             if (imagen != null && imagen.Length > 0)
@@ -131,15 +104,12 @@ public class ServiciosController : ControllerBase
                 new SqlParameter("@Titulo", Titulo),
                 new SqlParameter("@UsuarioID", UsuarioID),
                 new SqlParameter("@Ubicacion", Ubicacion),
-                new SqlParameter("@CategoriaID", categoriaFinalId),
+                new SqlParameter("@CategoriaID", CategoriaID),
                 new SqlParameter("@Descripcion", Descripcion ?? ""),
                 new SqlParameter("@ImagenURL", imagenUrl)
             };
-            
-            DataTable result = await _db.ExecuteQueryAsync("CrearServicioConId", p);
-            int servicioId = Convert.ToInt32(result.Rows[0]["Id"]);
-            
-            return Ok(new { mensaje = "Servicio publicado exitosamente", imagenUrl = imagenUrl, id = servicioId });
+            await _db.ExecuteNonQueryAsync("CrearServicio", p);
+            return Ok(new { mensaje = "Servicio publicado exitosamente", imagenUrl = imagenUrl });
         }
         catch (Exception ex)
         {
@@ -147,6 +117,37 @@ public class ServiciosController : ControllerBase
         }
     }
 
+    // Obtener servicios del usuario actual
+    [HttpGet("mis-servicios/{usuarioId}")]
+    public async Task<IActionResult> GetMisServicios(int usuarioId)
+    {
+        try
+        {
+            SqlParameter[] p = { new SqlParameter("@UsuarioID", usuarioId) };
+            DataTable dt = await _db.ExecuteQueryAsync("ObtenerServiciosPorUsuario", p);
+
+            var lista = dt.AsEnumerable().Select(row => new ServicioAlertaDto
+            {
+                Id = row.Field<int>("Id"),
+                Titulo = row.Field<string>("Titulo") ?? "",
+                Ubicacion = row.Field<string>("Ubicacion") ?? "",
+                Categoria = row.Field<string>("Categoria") ?? "",
+                Autor = row.Field<string>("Autor") ?? "",
+                FechaRegistro = row.Field<DateTime>("FechaRegistro"),
+                Descripcion = row.Field<string>("Descripcion") ?? "",
+                //UsuarioId = row.Field<int>("UsuarioID"),
+                ImagenURL = row.Field<string>("ImagenURL") ?? "/static/images/vacante.jpg"
+            }).ToList();
+
+            return Ok(lista);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    // Subir múltiples imágenes a un servicio
     [HttpPost("subir-imagenes/{servicioId}")]
     public async Task<IActionResult> SubirImagenes(int servicioId, List<IFormFile> imagenes)
     {
@@ -192,6 +193,7 @@ public class ServiciosController : ControllerBase
         }
     }
 
+    // Obtener imágenes de un servicio
     [HttpGet("imagenes/{servicioId}")]
     public async Task<IActionResult> GetImagenesServicio(int servicioId)
     {
@@ -215,6 +217,7 @@ public class ServiciosController : ControllerBase
         }
     }
 
+    // Eliminar una imagen
     [HttpDelete("imagenes/{imagenId}")]
     public async Task<IActionResult> EliminarImagen(int imagenId)
     {
@@ -325,35 +328,6 @@ public class ServiciosController : ControllerBase
         catch (Exception ex) 
         { 
             return BadRequest(new { error = ex.Message }); 
-        }
-    }
-
-    [HttpGet("mis-servicios/{usuarioId}")]
-    public async Task<IActionResult> GetMisServicios(int usuarioId)
-    {
-        try
-        {
-            SqlParameter[] p = { new SqlParameter("@UsuarioID", usuarioId) };
-            DataTable dt = await _db.ExecuteQueryAsync("ObtenerServiciosPorUsuario", p);
-
-            var lista = dt.AsEnumerable().Select(row => new ServicioAlertaDto
-            {
-                Id = row.Field<int>("Id"),
-                Titulo = row.Field<string>("Titulo") ?? "",
-                Ubicacion = row.Field<string>("Ubicacion") ?? "",
-                Categoria = row.Field<string>("Categoria") ?? "",
-                Autor = row.Field<string>("Autor") ?? "",
-                FechaRegistro = row.Field<DateTime>("FechaRegistro"),
-                Descripcion = row.Field<string>("Descripcion") ?? "",
-                UsuarioId = row.Field<int>("UsuarioID"),
-                ImagenURL = row.Field<string>("ImagenURL") ?? "/static/images/vacante.jpg"
-            }).ToList();
-
-            return Ok(lista);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(new { error = ex.Message });
         }
     }
 }

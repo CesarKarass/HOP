@@ -273,6 +273,21 @@
             padding: 10px;
             width: 100%;
         }
+        /* Footer con contacto */
+        .footer-contact {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 20px 0;
+            margin-top: 60px;
+        }
+        .contact-link {
+            color: var(--azul-oscuro);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .contact-link:hover {
+            color: var(--naranja-hop);
+        }
     </style>
 </head>
 <body>
@@ -280,7 +295,7 @@
     <nav class="nav-detail">
         <div class="container d-flex justify-content-between align-items-center">
             <a href="javascript:history.back()" class="text-decoration-none text-dark fw-bold">← Volver</a>
-            <span class="badge bg-secondary" id="servicioId">Cargando...</span>
+            <a href="/" class="text-decoration-none text-dark fw-bold">Volver a HOP</a>
         </div>
     </nav>
 
@@ -364,6 +379,15 @@
             </div>
         </div>
     </div>
+
+    <footer class="footer-contact">
+        <div class="container text-center">
+            <p class="mb-2">¿Tienes sugerencias o comentarios?</p>
+            <a href="mailto:hop.casa@gmail.com?subject=Sugerencia%20para%20HOP" class="contact-link">
+                <i class="bi bi-envelope"></i> Envíanos tus sugerencias a hop.casa@gmail.com
+            </a>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -561,8 +585,6 @@
                 
                 esPropietario = sesionActiva && usuarioActual && 
                     (servicioActual.autor === usuarioActual.nombre || servicioActual.autor === usuarioActual.nombreCompleto);
-                
-                document.getElementById('servicioId').textContent = `ID: ${servicioActual.id}`;
                 
                 await cargarImagenesServicio();
                 mostrarDetalle();

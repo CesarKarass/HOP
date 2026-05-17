@@ -70,7 +70,7 @@
             margin-left: 8px;
         }
         .back-btn { 
-            position: fixed; 
+            position: absolute; 
             top: 80px; 
             left: 30px; 
             font-size: 1.2rem; 
@@ -162,7 +162,6 @@
             transition: 0.3s;
             border: 1px solid #f0f0f0;
             box-shadow: 0 5px 15px rgba(0,0,0,0.02);
-            cursor: pointer;
         }
 
         .help-main-card:hover {
@@ -224,22 +223,20 @@
             border-radius: 20px 20px 0 0;
         }
         .faq-list {
-            max-height: 450px;
+            max-height: 400px;
             overflow-y: auto;
         }
         .faq-category-item {
             border-bottom: 1px solid #eee;
-            padding: 15px 0;
+            padding: 12px 0;
             cursor: pointer;
             transition: 0.2s;
         }
         .faq-category-item:hover {
-            background-color: #f8f9fa;
-            padding-left: 10px;
+            color: var(--naranja-hop);
         }
         .faq-category-item .faq-question {
-            font-weight: 600;
-            color: var(--azul-oscuro);
+            font-weight: 500;
         }
         .faq-category-item .faq-answer {
             font-size: 0.9rem;
@@ -250,55 +247,6 @@
         }
         .faq-category-item .faq-answer.show {
             display: block;
-        }
-        .contact-info {
-            background-color: #f8f9fa;
-            border-radius: 12px;
-            padding: 15px;
-        }
-        .btn-contacto {
-            background-color: var(--naranja-hop);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-        }
-        .btn-contacto:hover {
-            background-color: #e67e00;
-        }
-        .badge-palabra {
-            background-color: #e9ecef;
-            color: #6c757d;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 12px;
-            margin-left: 8px;
-        }
-        .sin-resultados {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-        }
-        .sugerencias {
-            background-color: #fff3e0;
-            border-radius: 12px;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 0.85rem;
-        }
-        .sugerencias span {
-            display: inline-block;
-            background: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            margin: 3px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .sugerencias span:hover {
-            background-color: var(--naranja-hop);
-            color: white;
         }
     </style>
 </head>
@@ -341,11 +289,11 @@
 
     <div class="container">
         <section class="help-banner">
-            <h1>¿Necesitas ayuda?</h1>
-            <p>Encuentra respuestas rápidas sobre cómo funciona HOP</p>
+            <h1>Consejos y respuestas de HOP</h1>
+            <p>Encuentra soluciones rápidas.</p>
             
             <div class="search-container shadow-lg">
-                <input type="text" id="searchFaq" placeholder="Ej: ¿Cómo publicar un servicio?, registro, CV, postularme">
+                <input type="text" id="searchFaq" placeholder="¿Qué duda tienes?">
                 <button class="btn-buscar-ayuda" id="searchBtn">BUSCAR</button>
             </div>
         </section>
@@ -359,8 +307,8 @@
                         <div class="circle-illustration">
                             <img src="http://localhost:5147/static/images/lupa1.png" alt="Busco Trabajo" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
                         </div>
-                        <h3>Busco trabajo o servicio</h3>
-                        <p>Encuentra respuestas para publicar tu CV, postularte a servicios y conectar con empleadores.</p>
+                        <h3>Busco trabajo</h3>
+                        <p>Encuentra respuestas a las preguntas más comunes para gestionar tu cuenta y encontrar el trabajo que quieres.</p>
                         <span class="view-topics">Ver temas →</span>
                     </div>
                 </div>
@@ -370,8 +318,8 @@
                         <div class="circle-illustration">
                             <img src="http://localhost:5147/static/images/reclutar1.png" alt="Soy Reclutador" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135768.png'">
                         </div>
-                        <h3>Quiero contratar o publicar</h3>
-                        <p>Información para publicar servicios, gestionar postulaciones y encontrar al candidato ideal.</p>
+                        <h3>Soy reclutador</h3>
+                        <p>Encuentra información para gestionar vacantes, usar herramientas de reclutamiento y resolver dudas frecuentes.</p>
                         <span class="view-topics">Ver temas →</span>
                     </div>
                 </div>
@@ -391,10 +339,8 @@
                     <div id="faqList" class="faq-list"></div>
                 </div>
                 <div class="modal-footer">
-                    <div class="contact-info w-100 text-center">
-                        <small>¿No encontraste lo que buscabas?</small>
-                        <button class="btn-contacto ms-2" id="contactarBtn">Contáctanos
-                        </button>
+                    <div class="contact-info w-100 text-center p-3 bg-light rounded">
+                        <small>¿No encontraste lo que buscabas? <a href="#" id="contactarLink" class="text-decoration-none fw-bold" style="color: var(--naranja-hop);">Contáctanos</a></small>
                     </div>
                 </div>
             </div>
@@ -406,14 +352,15 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Contáctanos</h5>
+                    <h5 class="modal-title"><i class="bi bi-envelope"></i> Contáctanos</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <i class="bi bi-envelope-fill" style="font-size: 2rem; color: var(--naranja-hop);"></i>
-                    <p class="mt-3"><strong>Email:</strong> hop.servicioacliente.com</p>
+                    <p><strong>Email:</strong> hop.sericioacliente.com</p>
                     <p><strong>Teléfono:</strong> 687-179-96-41</p>
                     <p><strong>Horario:</strong> Lunes a Viernes, 9:00 AM - 5:00 PM</p>
+                    <hr>
+                    <p class="text-muted small">También puedes escribirnos a través de nuestro chat en línea.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -424,126 +371,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ============================================
-        // FAQ DATA CON PALABRAS CLAVE PARA BÚSQUEDA AVANZADA
-        // ============================================
-        
-        // Palabras clave por sinónimos
-        const sinonimos = {
-            registro: ["registrarme", "registro", "crear cuenta", "inscribirme", "unirse", "nuevo usuario", "sign up", "register"],
-            cv: ["curriculum", "cv", "hoja de vida", "documento", "archivo", "pdf", "word", "subir cv", "mi cv"],
-            postular: ["postularme", "postulación", "aplicar", "candidato", "solicitar", "aplicar servicio", "postular servicio"],
-            mensaje: ["contactar", "escribir", "chat", "comunicarse", "mensaje", "hablar", "preguntar"],
-            calificacion: ["calificar", "estrella", "puntuación", "valorar", "reseña", "review", "rating"],
-            perfil: ["editar perfil", "mi perfil", "foto", "avatar", "información personal", "datos"],
-            publicar: ["publicar servicio", "crear servicio", "nuevo servicio", "vacante", "oferta", "anuncio", "publicación"],
-            negocio: ["mi negocio", "empresa", "comercio", "negocio", "dashboard", "panel"],
-            notificacion: ["notificaciones", "alertas", "avisos", "bell"],
-            servicio: ["servicio", "trabajo", "empleo", "chamba", "proyecto"],
-            fotos: ["imágenes", "galería", "carrusel", "multimedia", "subir foto"],
-            eliminar: ["borrar", "eliminar servicio", "remover", "quitar", "delete"],
-            editar: ["modificar", "cambiar", "actualizar", "editar servicio", "update"],
-            estado: ["pendiente", "aceptado", "rechazado", "estado postulación"]
-        };
-
-        // Función para normalizar texto (quitar acentos y mayúsculas)
-        function normalizarTexto(texto) {
-            return texto.toLowerCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/[.,¿?¡!;:()]/g, "");
-        }
-
-        // Función para verificar si una palabra clave coincide con los sinónimos
-        function coincideConSinonimos(busqueda, campoTexto) {
-            const textoNormalizado = normalizarTexto(campoTexto);
-            
-            for (const [categoria, palabras] of Object.entries(sinonimos)) {
-                for (const palabra of palabras) {
-                    if (busqueda.includes(palabra.toLowerCase()) || palabra.toLowerCase().includes(busqueda)) {
-                        if (textoNormalizado.includes(palabra.toLowerCase()) || 
-                            textoNormalizado.includes(normalizarTexto(palabra))) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
+        // FAQ Data
         const faqData = {
             trabajo: [
-                { 
-                    pregunta: "¿Cómo puedo registrarme en HOP?", 
-                    respuesta: "Para registrarte en HOP, haz clic en el botón 'Menú' en la esquina superior derecha y selecciona 'Iniciar Sesión'. Luego, elige 'Registrarse' y completa el formulario con tus datos personales. También puedes registrarte con Google para mayor rapidez.",
-                    palabrasClave: ["registro", "crear cuenta", "inscribirse", "nuevo usuario", "google"]
-                },
-                { 
-                    pregunta: "¿Cómo subir mi CV?", 
-                    respuesta: "Ve a la sección 'Mi CV' desde el menú principal. Allí podrás subir tu CV en formato PDF o Word. También podrás ver, editar el título o eliminar tus CVs subidos.",
-                    palabrasClave: ["cv", "curriculum", "hoja de vida", "documento", "pdf", "word", "subir"]
-                },
-                { 
-                    pregunta: "¿Cómo postularme a un servicio?", 
-                    respuesta: "Encuentra un servicio que te interese en la página principal, haz clic en 'Ver detalles' y luego en 'Postularme a este servicio'. Selecciona tu CV y escribe un mensaje para el empleador.",
-                    palabrasClave: ["postularme", "aplicar", "candidato", "solicitar", "postulación"]
-                },
-                { 
-                    pregunta: "¿Cómo contactar a un empleador?", 
-                    respuesta: "En la tarjeta del servicio, haz clic en el botón 'Mensaje' para abrir un chat directo con el publicante del servicio.",
-                    palabrasClave: ["mensaje", "contactar", "chat", "comunicarse", "escribir"]
-                },
-                { 
-                    pregunta: "¿Cómo funciona el sistema de calificaciones?", 
-                    respuesta: "Después de completar un servicio, puedes calificar al otro usuario de 1 a 5 estrellas. Esto ayuda a construir confianza en la comunidad.",
-                    palabrasClave: ["calificar", "estrellas", "puntuación", "valorar", "reseña"]
-                },
-                { 
-                    pregunta: "¿Qué hago si no recibo respuesta a mi postulación?", 
-                    respuesta: "Puedes enviar un mensaje directo al publicante usando el botón 'Mensaje' o postularte a otros servicios similares.",
-                    palabrasClave: ["respuesta", "sin respuesta", "no contestan", "espera"]
-                },
-                { 
-                    pregunta: "¿Puedo editar mi perfil?", 
-                    respuesta: "Sí, desde 'Mi Perfil' puedes editar tu nombre, ubicación, experiencia y subir una foto de perfil.",
-                    palabrasClave: ["perfil", "editar perfil", "foto", "avatar", "datos personales"]
-                }
+                { pregunta: "¿Cómo puedo registrarme en HOP?", respuesta: "Para registrarte en HOP, haz clic en el botón 'Menú' en la esquina superior derecha y selecciona 'Iniciar Sesión'. Luego, elige 'Registrarse' y completa el formulario con tus datos personales, experiencia laboral y ubicación." },
+                { pregunta: "¿Cómo postularme a un servicio?", respuesta: "Encuentra un servicio que te interese, haz clic en 'Ver detalles' y luego en 'Postularme'. El dueño del servicio recibirá tu solicitud." },
+                { pregunta: "¿Cómo funciona el sistema de calificaciones?", respuesta: "Después de completar un servicio, puedes calificar al otro usuario de 1 a 5 estrellas. Esto ayuda a construir confianza en la comunidad." },
+                { pregunta: "¿Qué hago si no recibo respuesta a mi postulación?", respuesta: "Puedes enviar un mensaje directo al publicante del servicio usando el botón 'Mensaje' en la tarjeta del servicio." }
             ],
             reclutador: [
-                { 
-                    pregunta: "¿Cómo publicar un servicio o vacante?", 
-                    respuesta: "Ve a 'Mi Negocio' en el menú principal. Completa el formulario con título, descripción, ubicación, categoría y fotos. Tu publicación aparecerá en el inicio.",
-                    palabrasClave: ["publicar", "crear servicio", "vacante", "anuncio", "publicación", "nuevo servicio"]
-                },
-                { 
-                    pregunta: "¿Cómo ver quién se postula a mis servicios?", 
-                    respuesta: "Desde 'Mi Negocio' puedes ver tus servicios. Las postulaciones llegan como notificaciones y también en la sección 'Postulaciones'.",
-                    palabrasClave: ["postulaciones", "candidatos", "interesados", "ver postulaciones", "aplicantes"]
-                },
-                { 
-                    pregunta: "¿Cómo revisar el CV de un candidato?", 
-                    respuesta: "Haz clic en la notificación de postulación. Allí encontrarás un enlace para descargar o ver el CV del candidato.",
-                    palabrasClave: ["cv", "curriculum", "revisar cv", "ver cv", "descargar cv"]
-                },
-                { 
-                    pregunta: "¿Cómo contactar a un candidato?", 
-                    respuesta: "Desde la notificación de postulación o desde los detalles de tu servicio, usa el botón 'Mensaje' para contactar al candidato.",
-                    palabrasClave: ["contactar candidato", "mensaje", "chat", "hablar con candidato"]
-                },
-                { 
-                    pregunta: "¿Puedo editar o eliminar mi publicación?", 
-                    respuesta: "Sí, desde los detalles de tu servicio encontrarás los botones 'Editar mi servicio' y 'Eliminar'.",
-                    palabrasClave: ["editar", "eliminar", "borrar", "modificar", "actualizar servicio"]
-                },
-                { 
-                    pregunta: "¿Qué significan los estados de postulación?", 
-                    respuesta: "Pendiente (recién recibida), Aceptado (aceptaste al candidato), Rechazado (no fue seleccionado). Puedes cambiar el estado desde la notificación.",
-                    palabrasClave: ["estado", "pendiente", "aceptado", "rechazado", "status"]
-                },
-                { 
-                    pregunta: "¿Puedo subir fotos a mis servicios?", 
-                    respuesta: "Sí, al publicar o editar puedes subir múltiples fotos que se mostrarán en un carrusel en la página de detalles.",
-                    palabrasClave: ["fotos", "imagenes", "galería", "carrusel", "multimedia"]
-                }
+                { pregunta: "¿Cómo publicar un servicio o vacante?", respuesta: "Ve a 'Mi Negocio' y completa el formulario. Tu publicación aparecerá en el inicio para que otros usuarios la vean." },
+                { pregunta: "¿Cómo ver quién se postula?", respuesta: "Desde 'Mi Negocio', podrás ver todas las postulaciones que recibes y contactar a los interesados." },
+                { pregunta: "¿Cómo hablar con un candidato?", respuesta: "En los detalles de tu publicación, usa el botón 'Mensaje' para comunicarte directamente." },
+                { pregunta: "¿Puedo editar o eliminar mi publicación?", respuesta: "Sí, entra a los detalles de tu servicio y usa los botones 'Editar' o 'Eliminar'." }
+                
             ]
         };
 
@@ -560,8 +401,10 @@
             }
         }
 
+        // Actualizar contador de notificaciones
         async function actualizarContadorNotificaciones() {
             if (!sesionActiva || !usuarioActual || !usuarioActual.id) return;
+            
             try {
                 const response = await fetch(`http://localhost:5147/api/Chat/notificaciones/${usuarioActual.id}`);
                 if (response.ok) {
@@ -582,112 +425,46 @@
             }
         }
 
-        // Función de búsqueda mejorada con palabras clave
-        function calcularRelevancia(faq, terminosBusqueda) {
-            let puntuacion = 0;
-            const textoPregunta = normalizarTexto(faq.pregunta);
-            const textoRespuesta = normalizarTexto(faq.respuesta);
-            
-            for (const termino of terminosBusqueda) {
-                if (textoPregunta.includes(termino) || textoRespuesta.includes(termino)) {
-                    puntuacion += 10;
-                }
-                if (faq.palabrasClave && faq.palabrasClave.some(pc => normalizarTexto(pc).includes(termino))) {
-                    puntuacion += 20;
-                }
-                if (coincideConSinonimos(termino, faq.pregunta + " " + faq.respuesta)) {
-                    puntuacion += 15;
-                }
-            }
-            return puntuacion;
-        }
-
+        // Función de búsqueda
         function buscarFaq() {
-            const searchTerm = document.getElementById('searchFaq').value.toLowerCase().trim();
-            if (!searchTerm) {
-                alert('Escribe una palabra clave para buscar');
-                return;
-            }
-            
-            const terminosBusqueda = searchTerm.split(/\s+/);
+            const searchTerm = document.getElementById('searchFaq').value.toLowerCase();
             const todasLasPreguntas = [...faqData.trabajo, ...faqData.reclutador];
-            
-            const resultados = todasLasPreguntas.map(faq => ({
-                faq: faq,
-                relevancia: calcularRelevancia(faq, terminosBusqueda)
-            })).filter(r => r.relevancia > 0)
-              .sort((a, b) => b.relevancia - a.relevancia)
-              .map(r => r.faq);
+            const resultados = todasLasPreguntas.filter(faq => 
+                faq.pregunta.toLowerCase().includes(searchTerm) || 
+                faq.respuesta.toLowerCase().includes(searchTerm)
+            );
             
             if (resultados.length > 0) {
-                mostrarResultadosBusqueda(resultados, searchTerm);
+                mostrarResultadosBusqueda(resultados);
             } else {
-                mostrarSinResultados();
+                alert('No se encontraron resultados para tu búsqueda. Por favor, contáctanos para más ayuda.');
             }
         }
 
-        function mostrarResultadosBusqueda(resultados, busqueda) {
-            const modalTitle = document.getElementById('faqModalTitle');
-            const faqList = document.getElementById('faqList');
-            modalTitle.innerHTML = `<i class="bi bi-search"></i> Resultados para "${busqueda}" (${resultados.length})`;
-            
-            faqList.innerHTML = resultados.map(faq => `
-                <div class="faq-category-item" onclick="toggleFaqAnswer(this)">
-                    <div class="faq-question">
-                        <i class="bi bi-question-circle"></i> ${faq.pregunta}
-                        ${faq.palabrasClave ? `<span class="badge-palabra">${faq.palabrasClave.slice(0,2).join(', ')}</span>` : ''}
-                    </div>
-                    <div class="faq-answer">${faq.respuesta}</div>
-                </div>
-            `).join('');
-            
-            const modal = new bootstrap.Modal(document.getElementById('faqModal'));
-            modal.show();
-        }
-
-        function mostrarSinResultados() {
+        function mostrarResultadosBusqueda(resultados) {
             const modalTitle = document.getElementById('faqModalTitle');
             const faqList = document.getElementById('faqList');
             modalTitle.innerHTML = '<i class="bi bi-search"></i> Resultados de búsqueda';
-            
-            faqList.innerHTML = `
-                <div class="sin-resultados">
-                    <i class="bi bi-emoji-frown" style="font-size: 3rem; color: #ccc;"></i>
-                    <p class="mt-3">No encontramos resultados para tu búsqueda.</p>
-                    <p class="small text-muted">Intenta con palabras clave como: "registro", "cv", "postular", "publicar", "calificar"</p>
-                    <div class="sugerencias">
-                        <strong>Sugerencias:</strong>
-                        <span onclick="buscarConSugerencia('registro')">registro</span>
-                        <span onclick="buscarConSugerencia('cv')">CV</span>
-                        <span onclick="buscarConSugerencia('postular')">postular</span>
-                        <span onclick="buscarConSugerencia('publicar')">publicar</span>
-                        <span onclick="buscarConSugerencia('calificar')">calificar</span>
-                        <span onclick="buscarConSugerencia('mensaje')">mensaje</span>
-                        <span onclick="buscarConSugerencia('eliminar')">eliminar</span>
-                    </div>
+            faqList.innerHTML = resultados.map(faq => `
+                <div class="faq-category-item" onclick="toggleFaqAnswer(this)">
+                    <div class="faq-question fw-bold">${faq.pregunta}</div>
+                    <div class="faq-answer">${faq.respuesta}</div>
                 </div>
-            `;
-            
+            `).join('');
             const modal = new bootstrap.Modal(document.getElementById('faqModal'));
             modal.show();
-        }
-
-        function buscarConSugerencia(termino) {
-            document.getElementById('searchFaq').value = termino;
-            buscarFaq();
         }
 
         function abrirModalFaq(tipo) {
             const modalTitle = document.getElementById('faqModalTitle');
             const faqList = document.getElementById('faqList');
             const data = faqData[tipo];
-            const titulo = tipo === 'trabajo' ? 'Busco trabajo o servicio' : 'Quiero contratar o publicar';
+            const titulo = tipo === 'trabajo' ? 'Busco trabajo' : 'Soy reclutador';
             
             modalTitle.innerHTML = titulo;
             faqList.innerHTML = data.map(faq => `
                 <div class="faq-category-item" onclick="toggleFaqAnswer(this)">
-                    <div class="faq-question"> ${faq.pregunta}
-                    </div>
+                    <div class="faq-question fw-bold">${faq.pregunta}</div>
                     <div class="faq-answer">${faq.respuesta}</div>
                 </div>
             `).join('');
@@ -706,18 +483,14 @@
         document.getElementById('searchFaq').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') buscarFaq();
         });
-        
-        document.getElementById('contactarBtn').addEventListener('click', function(e) {
+        document.getElementById('contactarLink').addEventListener('click', function(e) {
+            e.preventDefault();
             bootstrap.Modal.getInstance(document.getElementById('faqModal')).hide();
             setTimeout(() => {
                 const contactoModal = new bootstrap.Modal(document.getElementById('contactoModal'));
                 contactoModal.show();
             }, 300);
         });
-
-        window.buscarConSugerencia = buscarConSugerencia;
-        window.abrirModalFaq = abrirModalFaq;
-        window.toggleFaqAnswer = toggleFaqAnswer;
 
         // Inicializar
         actualizarMenu();

@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # SQL SERVER EN DOCKER
+  # ============================================
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: hop_sqlserver
+    restart: always
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Hop2026!Secure#DB"
+      MSSQL_PID: "Express"
+      MSSQL_AGENT_ENABLED: "true"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./backups:/var/opt/mssql/backups
+    networks:
+      - hop_network
+
+  # ============================================
+  # BACKEND - .NET API
+  # ============================================
+  backend:
+    build:
+      context: ./HOPAPI
+      dockerfile: Dockerfile
+    container_name: hop_backend
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__DefaultConnection: "Server=sqlserver;Database=hopbd;User Id=sa;Password=Hop2026!Secure#DB;TrustServerCertificate=true;"
+    ports:
+      - "5147:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - hop_network
+
+  # ============================================
+  # FRONTEND - NODE.JS
+  # ============================================
+  frontend:
+    build:
+      context: ./HOPFROND
+      dockerfile: Dockerfile
+    container_name: hop_frontend
+    restart: always
+    environment:
+      NODE_ENV: "production"
+      PORT: "3000"
+      API_BASE: "http://localhost:5147/api"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - hop_network
+
+  # ============================================
+  # NGINX REVERSE PROXY
+  # ============================================
+  nginx:
+    image: nginx:alpine
+    container_name: hop_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites:/etc/nginx/sites-enabled:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - certbot-etc:/etc/letsencrypt
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - hop_network
+
+  # ============================================
+  # CERTBOT (SSL)
+  # ============================================
+  certbot:
+    image: certbot/certbot
+    container_name: hop_certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - ./nginx/sites:/var/www/html
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+volumes:
+  sqlserver_data:
+  certbot-etc:
+
+networks:
+  hop_network:
+    driver: bridge

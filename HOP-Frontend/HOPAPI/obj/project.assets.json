@@ -1196,11 +1196,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Sarahi\\Documents\\hopapi\\HOPAPI.csproj",
+      "projectUniqueName": "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\HOPAPI.csproj",
       "projectName": "HOPAPI",
-      "projectPath": "C:\\Users\\Sarahi\\Documents\\hopapi\\HOPAPI.csproj",
+      "projectPath": "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\HOPAPI.csproj",
       "packagesPath": "C:\\Users\\Sarahi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Sarahi\\Documents\\hopapi\\obj\\",
+      "outputPath": "C:\\Users\\Sarahi\\Documents\\HOP-Frontend\\HOPAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1707,7 +1707,7 @@
       "code": "NU1510",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "PackageReference Microsoft.AspNetCore.Hosting.Abstractions no se eliminará. Considere la posibilidad de quitar este paquete de las dependencias, ya que es probable que no sea necesario.",
+      "message": "PackageReference Microsoft.AspNetCore.Hosting.Abstractions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
       "libraryId": "Microsoft.AspNetCore.Hosting.Abstractions",
       "targetGraphs": [
         "net10.0"
@@ -1717,7 +1717,7 @@
       "code": "NU1510",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "PackageReference Microsoft.AspNetCore.StaticFiles no se eliminará. Considere la posibilidad de quitar este paquete de las dependencias, ya que es probable que no sea necesario.",
+      "message": "PackageReference Microsoft.AspNetCore.StaticFiles will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
       "libraryId": "Microsoft.AspNetCore.StaticFiles",
       "targetGraphs": [
         "net10.0"

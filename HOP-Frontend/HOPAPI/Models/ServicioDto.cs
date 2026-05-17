@@ -9,6 +9,8 @@ public class ServicioDto
     public string Ubicacion { get; set; } = string.Empty;
     public int CategoriaID { get; set; }
     public string Descripcion { get; set; } = string.Empty;
+    public int? UsuarioId { get; set; }  // <-- AGREGAR ESTA LÍNEA
+
 }
 
 public class ServicioAlertaDto
@@ -22,7 +24,6 @@ public class ServicioAlertaDto
     public string Descripcion { get; set; } = string.Empty;
     public string ImagenURL { get; set; } = string.Empty;
     public int AutorId { get; set; }
-    public int? UsuarioId { get; set; }
 }
 
 public class FiltroServicioDto

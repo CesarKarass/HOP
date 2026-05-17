@@ -199,10 +199,6 @@
             padding: 8px 20px;
             border-radius: 8px;
         }
-        .list-group-item {
-            border-radius: 10px;
-            margin-bottom: 8px;
-        }
         .boton-nuevo-cv {
             background-color: var(--naranja-hop);
             color: white;
@@ -292,10 +288,10 @@
                 <p class="fw-bold mb-1">Arrastra y suelta tu archivo aquí</p>
                 <p class="text-muted small">o</p>
                 <button type="button" class="btn btn-sm btn-outline-secondary" id="selectBtn">Seleccionar archivo</button>
-                <p class="text-muted small mt-2">Formatos: PDF, DOCX (máx. 8 MB)</p>
+                <p class="text-muted small mt-2">Formatos: PDF (máx. 8 MB)</p>
             </div>
             
-            <input type="file" id="fileInput" style="display: none;" accept=".pdf,.docx,.doc">
+            <input type="file" id="fileInput" style="display: none;" accept=".pdf">
             
             <div class="mb-3 mt-3">
                 <label class="form-label fw-semibold">Título (opcional)</label>
@@ -408,7 +404,6 @@
         function getFileIcon(filename) {
             const ext = filename.split('.').pop().toLowerCase();
             if (ext === 'pdf') return '<i class="bi bi-file-earmark-pdf-fill text-danger"></i>';
-            if (ext === 'docx' || ext === 'doc') return '<i class="bi bi-file-earmark-word-fill text-primary"></i>';
             return '<i class="bi bi-file-earmark-text"></i>';
         }
         
@@ -421,27 +416,9 @@
             const urlCompleta = `${STATIC_BASE}${rutaArchivo}`;
             downloadLink.href = urlCompleta;
             
-            const ext = rutaArchivo.split('.').pop().toLowerCase();
-            
-            if (ext === 'pdf') {
-                previewBody.innerHTML = `
-                    <iframe src="${urlCompleta}" frameborder="0"></iframe>
-                `;
-            } else if (ext === 'docx' || ext === 'doc') {
-                // Usar Google Docs Viewer para DOCX
-                const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(urlCompleta)}&embedded=true`;
-                previewBody.innerHTML = `
-                    <iframe src="${viewerUrl}" frameborder="0"></iframe>
-                `;
-            } else {
-                previewBody.innerHTML = `
-                    <div class="preview-placeholder">
-                        <i class="bi bi-file-earmark" style="font-size: 3rem;"></i>
-                        <p>No se puede previsualizar este tipo de archivo</p>
-                        <a href="${urlCompleta}" class="btn btn-primary" target="_blank">Descargar archivo</a>
-                    </div>
-                `;
-            }
+            previewBody.innerHTML = `
+                <iframe src="${urlCompleta}" frameborder="0"></iframe>
+            `;
             
             modal.show();
         }
@@ -492,7 +469,7 @@
                         <div class="text-center py-5">
                             <i class="bi bi-file-earmark-text" style="font-size: 3rem; color: #ccc;"></i>
                             <p class="text-muted mt-2">No tienes CVs subidos</p>
-                           
+                            <button class="btn btn-primary mt-2" id="btnSubirPrimerCv">Subir mi primer CV</button>
                         </div>
                     `;
                     document.getElementById('btnSubirPrimerCv')?.addEventListener('click', () => {
@@ -578,11 +555,12 @@
         function handleFile(file) {
             if (!file) return;
             
-            const allowedExtensions = ['.pdf', '.docx', '.doc'];
+            // Solo permitir PDF
+            const allowedExtensions = ['.pdf'];
             const fileExt = '.' + file.name.split('.').pop().toLowerCase();
             
             if (!allowedExtensions.includes(fileExt)) {
-                mostrarNotificacion('Formato no válido. Solo PDF, DOC o DOCX', 'error');
+                mostrarNotificacion('Formato no soportado. Solo se permiten archivos PDF por seguridad', 'error');
                 return false;
             }
             
