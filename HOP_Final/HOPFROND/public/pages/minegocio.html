@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Negocio - HOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --azul-oscuro: #001F3F;
+            --naranja-hop: #fb8c00;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 4px rgb(0,0,0,0.5);
+            text-decoration: none;
+            z-index: 20;
+        }
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgb(0,0,0,0.15);
+            z-index: 20;
+            transition: 0.3s;
+        }
+        .home-btn:hover {
+            transform: scale(1.05);
+        }
+        .home-btn img {
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .biz-banner {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--azul-oscuro) 0%, #003366 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            margin-bottom: -40px;
+        }
+        .panel-title {
+            font-weight: 800;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 5px rgb(0,0,0,0.3);
+            margin: 0;
+        }
+        .panel-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        .main-container {
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 5;
+        }
+        .biz-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgb(0,0,0,0.08);
+            border-top: 6px solid var(--naranja-hop);
+            margin-bottom: 25px;
+        }
+        .stat-box {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgb(0,0,0,0.06);
+            border-bottom: 4px solid #eee;
+            margin-bottom: 20px;
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--azul-oscuro);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        .btn-edit-biz {
+            background-color: transparent;
+            color: var(--naranja-hop);
+            border: 2px solid var(--naranja-hop);
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .btn-edit-biz:hover {
+            background-color: var(--naranja-hop);
+            color: white;
+        }
+        .btn-post {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .btn-post:hover {
+            background-color: #002d5c;
+            transform: translateY(-2px);
+        }
+        .promo-container {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 50px;
+        }
+        .promo-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            max-width: 850px;
+            width: 100%;
+            text-align: center;
+        }
+        .promo-header {
+            background: linear-gradient(135deg, var(--azul-oscuro) 0%, #003366 100%);
+            color: white;
+            padding: 100px 40px;
+        }
+        .btn-register-biz {
+            background-color: var(--naranja-hop);
+            color: white;
+            padding: 18px 45px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-register-biz:hover {
+            background-color: #e67e00;
+            transform: translateY(-3px);
+        }
+        .servicio-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--naranja-hop);
+            transition: 0.2s;
+        }
+        .servicio-item:hover {
+            background: #fff8f0;
+        }
+        .servicio-titulo {
+            font-weight: bold;
+            color: var(--azul-oscuro);
+        }
+        .mensaje-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #1976d2;
+        }
+        .calificacion-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ffc107;
+        }
+        .stars {
+            color: #ffc107;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 50px;
+        }
+        .sin-servicios {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+        .btn-responder {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+        .btn-responder:hover {
+            background-color: #0d47a1;
+        }
+        .servicios-lista {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .responsable-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+        .initial-circle {
+            width: 55px;
+            height: 55px;
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:history.back()" class="back-btn">←</a>
+    <a href="/" class="home-btn">
+        <span>Volver a HOP</span>
+        <img src="http://localhost:5147/static/images/logohop.jpeg" alt="Logo HOP">
+    </a>
+
+    <div id="contenidoDinamico">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando tu negocio...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5147/api';
+        
+        const sesionActiva = localStorage.getItem('hop_session') === 'active';
+        const usuarioActual = JSON.parse(localStorage.getItem('hop_usuario') || 'null');
+
+        if (!sesionActiva || !usuarioActual) {
+            window.location.href = '/login';
+        }
+
+        let mensajesRecibidos = [];
+        let calificacionesRecibidas = [];
+        let misServicios = [];
+
+        async function cargarMisServicios() {
+            try {
+                const response = await fetch(`${API_BASE}/Servicios/mis-servicios/${usuarioActual.id}`);
+                
+                if (!response.ok) {
+                    console.error('Error en la respuesta:', response.status);
+                    throw new Error('Error al cargar servicios');
+                }
+                
+                misServicios = await response.json();
+                
+                console.log('Usuario actual ID:', usuarioActual.id);
+                console.log('Servicios encontrados:', misServicios.length);
+                
+                await Promise.all([
+                    cargarMensajesRecibidos(),
+                    cargarCalificacionesRecibidas()
+                ]);
+                
+                if (misServicios && misServicios.length > 0) {
+                    mostrarPanelConServicios();
+                } else {
+                    mostrarPanelSinServicios();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarPanelSinServicios();
+            }
+        }
+
+        async function cargarMensajesRecibidos() {
+            try {
+                const response = await fetch(`${API_BASE}/Chat/mensajes-recibidos/${usuarioActual.id}`);
+                if (response.ok) {
+                    mensajesRecibidos = await response.json();
+                }
+            } catch (error) {
+                console.error('Error cargando mensajes:', error);
+                mensajesRecibidos = [];
+            }
+        }
+
+        async function cargarCalificacionesRecibidas() {
+            try {
+                const response = await fetch(`${API_BASE}/Calificaciones/mis-calificaciones/${usuarioActual.id}`);
+                if (response.ok) {
+                    calificacionesRecibidas = await response.json();
+                }
+            } catch (error) {
+                console.error('Error cargando calificaciones:', error);
+                calificacionesRecibidas = [];
+            }
+        }
+
+        async function enviarRespuestaMensaje(emisorId, emisorNombre) {
+            const mensaje = prompt(`Responder a ${emisorNombre}:`);
+            if (!mensaje || !mensaje.trim()) return;
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emisorId', usuarioActual.id);
+                formData.append('receptorId', emisorId);
+                formData.append('mensaje', mensaje);
+                
+                const response = await fetch(`${API_BASE}/Chat/enviar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    alert('✅ Mensaje enviado correctamente');
+                } else {
+                    throw new Error('Error al enviar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('❌ Error al enviar el mensaje');
+            }
+        }
+
+        async function eliminarServicio(servicioId) {
+            if (confirm('¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede deshacer.')) {
+                try {
+                    const response = await fetch(`${API_BASE}/Servicios/${servicioId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        alert('✓ Servicio eliminado correctamente');
+                        await cargarMisServicios();
+                    } else {
+                        const error = await response.json();
+                        alert('Error al eliminar: ' + (error.error || 'Error desconocido'));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error al conectar con el servidor');
+                }
+            }
+        }
+
+        function mostrarPanelConServicios() {
+            const datosEmpresa = {
+                nombre_comercial: usuarioActual.nombreCompleto || usuarioActual.nombre || "Mi Negocio",
+                razon_social: usuarioActual.nombreCompleto || usuarioActual.nombre || "Mi Negocio",
+                rfc: "PENDIENTE",
+                sector: "Servicios Generales",
+                localidad: "Los Mochis, Sinaloa",
+                responsable: usuarioActual.nombreCompleto || usuarioActual.nombre,
+                email: usuarioActual.email || "correo@ejemplo.com",
+                telefono: usuarioActual.telefono || "(668) 000-0000",
+                vacantes_est: misServicios.length,
+                empleados: 1
+            };
+
+            let promedioCalificaciones = 0;
+            if (calificacionesRecibidas.length > 0) {
+                const suma = calificacionesRecibidas.reduce((acc, c) => acc + c.puntuacion, 0);
+                promedioCalificaciones = (suma / calificacionesRecibidas.length).toFixed(1);
+            }
+
+            let serviciosHtml = '';
+            misServicios.forEach(servicio => {
+                serviciosHtml += `
+                    <div class="servicio-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="servicio-titulo">${escapeHtml(servicio.titulo)}</div>
+                                <small class="text-muted">${escapeHtml(servicio.categoria)} • ${escapeHtml(servicio.ubicacion)}</small>
+                                <p class="small mt-2 mb-0">${escapeHtml(servicio.descripcion ? servicio.descripcion.substring(0, 100) : 'Sin descripción')}</p>
+                            </div>
+                            <div>
+                                <span class="badge bg-success">Activo</span>
+                            </div>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex gap-2 justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">Publicado: ${new Date(servicio.fechaRegistro).toLocaleDateString()}</small>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <a href="/negocio/${servicio.id}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                                <button class="btn btn-sm btn-outline-danger" onclick="eliminarServicio(${servicio.id})">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            let mensajesHtml = '';
+            if (mensajesRecibidos.length > 0) {
+                mensajesHtml = mensajesRecibidos.slice(0, 5).map(m => `
+                    <div class="mensaje-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong><i class="bi bi-person-circle"></i> ${escapeHtml(m.emisorNombre)}</strong>
+                                <p class="small mb-1">${escapeHtml(m.mensaje)}</p>
+                                <small class="text-muted">${new Date(m.fechaEnvio).toLocaleString()}</small>
+                            </div>
+                            <button class="btn-responder" onclick="enviarRespuestaMensaje(${m.emisorId}, '${escapeHtml(m.emisorNombre)}')">
+                                <i class="bi bi-reply"></i> Responder
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                mensajesHtml = '<p class="text-muted text-center py-3">No tienes mensajes recibidos</p>';
+            }
+
+            let calificacionesHtml = '';
+            if (calificacionesRecibidas.length > 0) {
+                calificacionesHtml = calificacionesRecibidas.slice(0, 5).map(c => `
+                    <div class="calificacion-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="stars">
+                                    ${'★'.repeat(c.puntuacion)}${'☆'.repeat(5 - c.puntuacion)}
+                                </div>
+                                <p class="small mb-1">${escapeHtml(c.comentario || 'Sin comentario')}</p>
+                                <small class="text-muted">De: ${escapeHtml(c.calificadorNombre)} • ${new Date(c.fecha).toLocaleDateString()}</small>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                calificacionesHtml += `
+                    <div class="mt-3 text-center">
+                        <span class="badge bg-info">⭐ Promedio: ${promedioCalificaciones} (${calificacionesRecibidas.length} calificaciones)</span>
+                    </div>
+                `;
+            } else {
+                calificacionesHtml = '<p class="text-muted text-center py-3">Aún no tienes calificaciones</p>';
+            }
+
+            const contenido = `
+                <div class="biz-banner">
+                    <h1 class="panel-title">Panel de ${escapeHtml(datosEmpresa.nombre_comercial)}</h1>
+                    <p class="panel-subtitle">Sede Los Mochis, Sinaloa</p>
+                </div>
+
+                <div class="container main-container">
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <div class="biz-card">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h4 class="fw-bold m-0">Información General</h4>
+
+                                </div>
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label class="text-muted small d-block">Razón Social</label>
+                                        <span class="fw-semibold">${escapeHtml(datosEmpresa.razon_social)}</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small d-block">RFC</label>
+                                        <span class="fw-semibold">${escapeHtml(datosEmpresa.rfc)}</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small d-block">Sector</label>
+                                        <div><span class="badge bg-primary px-3 py-2">${escapeHtml(datosEmpresa.sector)}</span></div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="text-muted small d-block">Localidad</label>
+                                        <span class="fw-semibold">${escapeHtml(datosEmpresa.localidad)}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="biz-card">
+                                <h4 class="fw-bold mb-3">Datos del Responsable</h4>
+                                <div class="responsable-box shadow-sm">
+                                    <div class="initial-circle">
+                                        ${escapeHtml(datosEmpresa.responsable.charAt(0).toUpperCase())}
+                                    </div>
+                                    <div>
+                                        <h5 class="fw-bold mb-1">${escapeHtml(datosEmpresa.responsable)}</h5>
+                                        <p class="text-muted mb-0 small">${escapeHtml(datosEmpresa.email)} • ${escapeHtml(datosEmpresa.telefono)}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="biz-card">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h4 class="fw-bold m-0"><i class="bi bi-briefcase"></i> Mis Servicios (${misServicios.length})</h4>
+                                </div>
+                                <div class="servicios-lista">
+                                    ${serviciosHtml}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="stat-box">
+                                <div class="stat-number">${datosEmpresa.vacantes_est}</div>
+                                <div class="stat-label">Servicios Publicados</div>
+                            </div>
+
+                            <div class="stat-box" style="border-bottom-color: var(--naranja-hop);">
+                                <div class="stat-number">${promedioCalificaciones || 'N/A'}</div>
+                                <div class="stat-label">Calificación Promedio</div>
+                            </div>
+                            
+                            <div class="biz-card">
+                                <h4 class="fw-bold mb-3"><i class="bi bi-star-fill"></i> Calificaciones</h4>
+                                ${calificacionesHtml}
+                            </div>
+
+                            <button class="btn-post" onclick="window.location.href='/registro_empresa'">
+                                <i class="bi bi-plus-circle"></i> Publicar Nuevo Servicio
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensajes Recibidos -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="biz-card">
+                                <h4 class="fw-bold mb-4"><i class="bi bi-chat-dots"></i> Mensajes Recibidos</h4>
+                                ${mensajesHtml}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="biz-card">
+                                <h4 class="fw-bold mb-4"><i class="bi bi-star-fill"></i> Calificaciones</h4>
+                                ${calificacionesHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('contenidoDinamico').innerHTML = contenido;
+        }
+
+        function mostrarPanelSinServicios() {
+            const contenido = `
+                <div class="container promo-container">
+                    <div class="promo-card shadow">
+                        <div class="promo-header">
+                            <h1 class="fw-bold">¿Tienes un negocio?</h1>
+                            <p>Únete a la red de Hidalgo y haz que tu empresa crezca encontrando al talento ideal en minutos.</p>
+                            <a href="/registro_empresa" class="btn-register-biz">Registrar mi Negocio Ahora</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('contenidoDinamico').innerHTML = contenido;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        window.enviarRespuestaMensaje = enviarRespuestaMensaje;
+        window.eliminarServicio = eliminarServicio;
+        
+        cargarMisServicios();
+    </script>
+</body>
+</html>

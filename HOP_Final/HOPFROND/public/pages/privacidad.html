@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacidad y Marco Legal - HOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { 
+            --azul-oscuro: #001F3F; 
+            --naranja-hop: #fb8c00;
+        }
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        .navbar-custom { 
+            background-color: white; 
+            border-bottom: 1px solid #ddd; 
+            padding: 0.5rem 2rem; 
+        }
+        .navbar-brand img {
+            height: 45px; width: 45px;
+            border-radius: 50%; object-fit: cover;
+            margin-right: 10px;
+        }
+        .brand-text { 
+            color: var(--azul-oscuro); 
+            font-weight: bold; 
+            font-size: 1.5rem; 
+        }
+        .nav-link { 
+            color: #555 !important; 
+            margin: 0 10px; 
+            font-weight: 500; 
+        }
+        .nav-link:hover {
+            color: var(--azul-oscuro) !important;
+        }
+        .nav-hop-main { 
+            color: var(--azul-oscuro) !important; 
+            font-weight: bold !important; 
+        }
+        .btn-menu { 
+            background-color: var(--azul-oscuro); 
+            color: white; 
+            border-radius: 5px; 
+            padding: 5px 15px; 
+            border: none; 
+        }
+        .btn-menu:hover {
+            background-color: #002d5c;
+            color: white;
+        }
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgb(0,0,0,0.1);
+            border: none;
+        }
+        .dropdown-item i {
+            width: 25px;
+            margin-right: 8px;
+        }
+        .badge-notif {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, var(--azul-oscuro) 0%, #003366 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: -50px;
+            border-radius: 0 0 40px 40px;
+        }
+
+        .info-card {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            height: 100%;
+        }
+        .section-header {
+            color: var(--azul-oscuro);
+            font-weight: bold;
+            border-left: 5px solid var(--naranja-hop);
+            padding-left: 15px;
+            margin-bottom: 25px;
+        }
+        .badge-hop {
+            background-color: var(--naranja-hop);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        .legal-item {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid var(--azul-oscuro);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        .legal-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-left-color: var(--naranja-hop);
+        }
+
+        .modal-header { 
+            background-color: var(--azul-oscuro); 
+            color: white; 
+            border-radius: 14px 14px 0 0; 
+        }
+        .modal-content { 
+            border-radius: 15px; 
+            border: none; 
+        }
+        .btn-close-white { 
+            filter: invert(1) grayscale(100%) brightness(200%); 
+        }
+        footer {
+            margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="http://localhost:5147/static/images/logohop.jpeg" alt="HOP">
+                <span class="brand-text">HOP</span>
+            </a>
+            <div class="navbar-nav mx-auto">
+                <a class="nav-link" href="/inicio">Inicio</a>
+                <a class="nav-link" href="/">HOP</a>
+                <a class="nav-link nav-hop-main" href="/privacidad">Privacidad</a>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-menu shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-list"></i> Menú
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/miperfil"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="/micv"><i class="bi bi-file-text"></i> Mi CV</a></li>
+                    <li><a class="dropdown-item" href="/minegocio"><i class="bi bi-building"></i> Mi Negocio</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/notificaciones"><i class="bi bi-bell"></i> Notificaciones <span id="notifBadge" class="badge-notif" style="display: none;">0</span></a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/configuracion"><i class="bi bi-gear"></i> Configuracion</a></li>
+                    <li><a class="dropdown-item" href="/ayuda"><i class="bi bi-question-circle"></i> Ayuda</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutMenuItem"><i class="bi bi-box-arrow-right"></i> Cerrar Sesion</a></li>
+                    <li><a class="dropdown-item" href="/login" id="menuLoginItem"><i class="bi bi-box-arrow-in-right"></i> Iniciar Sesion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <header class="hero-section text-center shadow">
+        <div class="container">
+            <h1 class="display-3 fw-bold">Centro de Transparencia</h1>
+            <p class="lead opacity-75">Nuestra misión, visión y el compromiso legal con tu seguridad.</p>
+        </div>
+    </header>
+
+    <div class="container" style="margin-top: 100px;">
+        <div class="row g-4 mb-5">
+            <div class="col-md-6">
+                <div class="card info-card p-4">
+                    <span class="badge-hop">Propósito</span>
+                    <h3 class="section-header">Misión</h3>
+                    <p class="text-muted mb-0">
+                        Conectar rápidamente trabajadores locales con oportunidades de empleo informal y formal, 
+                        facilitando búsquedas por habilidades, ubicación y urgencia para impulsar economías 
+                        comunitarias accesibles y confiables.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card info-card p-4">
+                    <span class="badge-hop">Futuro</span>
+                    <h3 class="section-header">Visión</h3>
+                    <p class="text-muted mb-0">
+                        Ser la plataforma líder en México para oficios cotidianos, donde cualquiera encuentra o 
+                        ofrece trabajo en minutos, fomentando prosperidad inclusiva mediante tecnología simple y segura.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5 mb-5">
+            <div class="col-12">
+                <h3 class="section-header mb-4">Marco Legal y Políticas</h3>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="legal-item" data-bs-toggle="modal" data-bs-target="#modalTerminos">
+                            <h5 class="fw-bold">Términos y condiciones</h5>
+                            <p class="small text-muted mb-0">Reglas de uso de nuestra plataforma.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="legal-item" data-bs-toggle="modal" data-bs-target="#modalPrivacidad">
+                            <h5 class="fw-bold">Política de privacidad</h5>
+                            <p class="small text-muted mb-0">Protección estricta de tus datos personales.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="legal-item" data-bs-toggle="modal" data-bs-target="#modalDatos">
+                            <h5 class="fw-bold">Política de uso de datos</h5>
+                            <p class="small text-muted mb-0">Transparencia en el manejo de información.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="legal-item" data-bs-toggle="modal" data-bs-target="#modalServicios">
+                            <h5 class="fw-bold">Responsabilidad sobre servicios</h5>
+                            <p class="small text-muted mb-0">Acuerdos sobre las publicaciones realizadas.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="legal-item" data-bs-toggle="modal" data-bs-target="#modalLegal">
+                            <h5 class="fw-bold">Marco legal operativo</h5>
+                            <p class="small text-muted mb-0">Leyes bajo las cuales opera HOP en México.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="legal-item" data-bs-toggle="modal" data-bs-target="#modalOficios">
+                            <h5 class="fw-bold">Política frente a oficios informales</h5>
+                            <p class="small text-muted mb-0">Dignificación y regularización del trabajo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal fade" id="modalTerminos" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Términos y condiciones</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>HOP es una plataforma de <strong>intermediación</strong>. Facilitamos la conexión entre empresas y candidatos, pero no somos responsables de los acuerdos, contratos o relaciones laborales que surjan entre las partes.</p>
+                    <h6 class="fw-bold mt-3">Responsabilidad del Usuario</h6>
+                    <ul class="small">
+                        <li><strong>Veracidad:</strong> Te comprometes a que toda la información en tu perfil o vacante sea real y honesta.</li>
+                        <li><strong>Uso Debido:</strong> Queda prohibido el uso de la plataforma para fines ilícitos, spam o discriminación.</li>
+                        <li><strong>Seguridad:</strong> Eres responsable de cuidar tus datos de acceso.</li>
+                    </ul>
+                    <h6 class="fw-bold mt-3">Propiedad Intelectual</h6>
+                    <p class="small">El diseño, logo y código de HOP son propiedad de la empresa. No está permitida su reproducción sin permiso.</p>
+                    <h6 class="fw-bold mt-3">Limitación de Responsabilidad</h6>
+                    <p class="small">HOP no garantiza la contratación ni se hace responsable por la calidad o veracidad de los perfiles y vacantes publicados por terceros. El uso del sitio es bajo tu propio riesgo.</p>
+                    <h6 class="fw-bold mt-3">Privacidad y Datos</h6>
+                    <p class="small">Al usar HOP, aceptas que procesemos tus datos (como tu CV) para fines de vinculación profesional y análisis mediante nuestras herramientas tecnológicas.</p>
+                    <h6 class="fw-bold mt-3">Modificaciones</h6>
+                    <p class="small">Nos reservamos el derecho de actualizar estos términos. El uso continuo de la plataforma implica la aceptación de los cambios.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalPrivacidad" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Política de privacidad</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>En HOP, la protección de tus datos personales es nuestra prioridad. Esta política describe cómo recopilamos, usamos y protegemos tu información.</p>
+                    <h6 class="fw-bold mt-3">1. Información que Recopilamos</h6>
+                    <ul class="small">
+                        <li>Información de registro (nombre, correo electrónico, teléfono)</li>
+                        <li>Información de perfil (experiencia laboral, habilidades, ubicación)</li>
+                        <li>Publicaciones de servicios y empleos</li>
+                        <li>Datos de uso de la plataforma</li>
+                        <li>Información de comunicación entre usuarios</li>
+                    </ul>
+                    <h6 class="fw-bold mt-3">2. Uso de la Información</h6>
+                    <ul class="small">
+                        <li>Facilitar la conexión entre trabajadores y contratantes</li>
+                        <li>Mejorar la experiencia de usuario y los filtros de búsqueda</li>
+                        <li>Enviar notificaciones sobre oportunidades laborales</li>
+                        <li>Prevenir fraudes y garantizar la seguridad de la plataforma</li>
+                    </ul>
+                    <h6 class="fw-bold mt-3">3. Protección de Datos</h6>
+                    <p class="small">Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra acceso no autorizado, pérdida o alteración.</p>
+                    <h6 class="fw-bold mt-3">4. Compartir Información</h6>
+                    <p class="small">No vendemos ni alquilamos tu información personal. Solo compartimos información con tu consentimiento o para cumplir con obligaciones legales.</p>
+                    <h6 class="fw-bold mt-3">5. Contacto</h6>
+                    <p class="small">Para ejercer tus derechos ARCO, contáctanos en: privacidad@hop.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalDatos" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Política de uso de datos</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tus datos se utilizan para optimizar las búsquedas por ubicación y mejorar la experiencia de usuario en la plataforma.</p>
+                    <h6 class="fw-bold mt-3">Finalidades del tratamiento:</h6>
+                    <ul class="small">
+                        <li>Personalizar los resultados de búsqueda según tu ubicación y preferencias</li>
+                        <li>Mejorar la precisión de los filtros (ubicación, tipo de trabajo, pago)</li>
+                        <li>Analizar patrones de uso para optimizar la plataforma</li>
+                        <li>Generar estadísticas agregadas y anónimas</li>
+                    </ul>
+                    <p class="small mt-3">Tus datos son tratados con estricta confidencialidad y solo se utilizan para los fines descritos en esta política.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalServicios" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Responsabilidad sobre servicios</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>HOP actúa únicamente como plataforma de intermediación. No somos responsables por:</p>
+                    <ul class="small">
+                        <li>La calidad, seguridad o cumplimiento de los servicios prestados entre usuarios</li>
+                        <li>Los acuerdos económicos pactados directamente entre las partes</li>
+                        <li>Incumplimientos, demoras o cancelaciones de servicios contratados</li>
+                        <li>Conflictos laborales que surjan entre trabajadores y contratantes</li>
+                    </ul>
+                    <h6 class="fw-bold mt-3">Recomendaciones:</h6>
+                    <ul class="small">
+                        <li>Verifica la identidad y referencias de la otra parte antes de contratar</li>
+                        <li>Define claramente los términos del servicio (alcance, precio, tiempos)</li>
+                        <li>Utiliza los canales de comunicación internos de la plataforma</li>
+                        <li>Reporta cualquier actividad sospechosa al equipo de moderación</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalLegal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Marco legal operativo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>HOP opera bajo el marco legal mexicano, cumpliendo con las siguientes disposiciones:</p>
+                    <ul class="small">
+                        <li><strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares (LFPDPPP)</strong> - Protección de datos personales</li>
+                        <li><strong>Ley Federal de Protección al Consumidor</strong> - Transparencia en las relaciones comerciales</li>
+                        <li><strong>Código Civil Federal</strong> - Obligaciones y contratos civiles</li>
+                        <li><strong>Ley de Comercio Electrónico</strong> - Transacciones digitales</li>
+                        <li><strong>NOM-151-SCFI-2016</strong> - Conservación de mensajes de datos</li>
+                    </ul>
+                    <p class="small mt-3">Para más información sobre nuestro cumplimiento normativo, contáctanos en: legal@hop.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalOficios" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Política frente a oficios informales</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>En HOP reconocemos y valoramos el trabajo informal como parte fundamental de la economía local. Nuestra política incluye:</p>
+                    <h6 class="fw-bold mt-3">Compromisos:</h6>
+                    <ul class="small">
+                        <li><strong>Dignificación:</strong> Visibilizamos y damos valor a todos los oficios, independientemente de su estatus formal</li>
+                        <li><strong>Reputación digital:</strong> Ayudamos a construir una trayectoria profesional verificable</li>
+                        <li><strong>Seguridad:</strong> Implementamos medidas para proteger a trabajadores informales</li>
+                        <li><strong>Capacitación:</strong> Promovemos la formalización gradual a través de información y recursos</li>
+                    </ul>
+                    <h6 class="fw-bold mt-3">Diferenciación:</h6>
+                    <ul class="small">
+                        <li><strong>Oficio formal:</strong> Cuenta con registro legal, certificaciones o está dado de alta en el SAT</li>
+                        <li><strong>Oficio informal:</strong> Servicio ofrecido sin registro formal (plomería, jardinería, reparaciones, etc.)</li>
+                    </ul>
+                    <p class="small mt-3">Ambos tipos de oficios son bienvenidos en HOP. Evaluamos la calidad del servicio y la confiabilidad del usuario, no su estatus formal.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-white py-4 mt-auto border-top">
+        <div class="container text-center text-muted">
+            <small>&copy; 2026 Hidalgo Operation Production - Todos los derechos reservados.</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5147/api';
+        
+        let usuarioActual = null;
+        let sesionActiva = false;
+        
+        function cargarUsuarioLocal() {
+            const userStr = localStorage.getItem('hop_usuario');
+            const session = localStorage.getItem('hop_session');
+            
+            if (userStr && session === 'active') {
+                try {
+                    usuarioActual = JSON.parse(userStr);
+                    sesionActiva = true;
+                    return true;
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+            sesionActiva = false;
+            usuarioActual = null;
+            return false;
+        }
+        
+        function actualizarMenu() {
+            const loginItem = document.getElementById('menuLoginItem');
+            const logoutItem = document.getElementById('logoutMenuItem');
+            
+            if (sesionActiva && usuarioActual) {
+                if (loginItem) loginItem.style.display = 'none';
+                if (logoutItem) logoutItem.style.display = 'block';
+            } else {
+                if (loginItem) loginItem.style.display = 'block';
+                if (logoutItem) logoutItem.style.display = 'none';
+            }
+        }
+        
+        // Cerrar sesión
+        document.getElementById('logoutMenuItem')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('hop_session');
+            localStorage.removeItem('hop_usuario');
+            window.location.href = '/';
+        });
+        
+        async function actualizarContadorNotificaciones() {
+            if (!sesionActiva || !usuarioActual || !usuarioActual.id) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/Chat/notificaciones/${usuarioActual.id}`);
+                if (response.ok) {
+                    const notificaciones = await response.json();
+                    const noLeidas = notificaciones.filter(n => !n.leida).length;
+                    const badge = document.getElementById('notifBadge');
+                    if (badge) {
+                        if (noLeidas > 0) {
+                            badge.textContent = noLeidas;
+                            badge.style.display = 'inline-block';
+                        } else {
+                            badge.style.display = 'none';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error cargando contador:', error);
+            }
+        }
+        
+        cargarUsuarioLocal();
+        actualizarMenu();
+        actualizarContadorNotificaciones();
+    </script>
+</body>
+</html>
