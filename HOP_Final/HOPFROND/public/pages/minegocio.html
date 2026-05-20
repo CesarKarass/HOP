@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Negocio - HOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --azul-oscuro: #001F3F;
+            --naranja-hop: #fb8c00;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 0 2px 4px rgb(0,0,0,0.5);
+            text-decoration: none;
+            z-index: 20;
+        }
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgb(0,0,0,0.15);
+            z-index: 20;
+            transition: 0.3s;
+        }
+        .home-btn:hover {
+            transform: scale(1.05);
+        }
+        .home-btn img {
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .biz-banner {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, var(--azul-oscuro) 0%, #003366 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            margin-bottom: -40px;
+        }
+        .panel-title {
+            font-weight: 800;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 5px rgb(0,0,0,0.3);
+            margin: 0;
+        }
+        .main-container {
+            margin-bottom: 60px;
+            position: relative;
+            z-index: 5;
+        }
+        .biz-card {
+            background: white;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 10px 30px rgb(0,0,0,0.08);
+            border-top: 6px solid var(--naranja-hop);
+            margin-bottom: 25px;
+        }
+        .stat-box {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgb(0,0,0,0.06);
+            border-bottom: 4px solid #eee;
+            margin-bottom: 20px;
+        }
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--azul-oscuro);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+        .servicio-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--naranja-hop);
+            transition: 0.2s;
+        }
+        .servicio-item:hover {
+            background: #fff8f0;
+        }
+        .servicio-titulo {
+            font-weight: bold;
+            color: var(--azul-oscuro);
+        }
+        .reclutando-badge {
+            background-color: #28a745;
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+        .no-reclutando-badge {
+            background-color: #6c757d;
+            color: white;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: 8px;
+        }
+        .servicios-lista {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .btn-post {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .btn-post:hover {
+            background-color: #002d5c;
+            transform: translateY(-2px);
+        }
+        .btn-danger-custom {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+        .btn-danger-custom:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        .promo-container {
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 50px;
+        }
+        .promo-card {
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.05);
+            max-width: 850px;
+            width: 100%;
+            text-align: center;
+        }
+        .promo-header {
+            background: linear-gradient(135deg, var(--azul-oscuro) 0%, #003366 100%);
+            color: white;
+            padding: 100px 40px;
+        }
+        .btn-register-biz {
+            background-color: var(--naranja-hop);
+            color: white;
+            padding: 18px 45px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 50px;
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast-success { background-color: #28a745; color: white; border-radius: 10px; padding: 12px 20px; }
+        .toast-error { background-color: #dc3545; color: white; border-radius: 10px; padding: 12px 20px; }
+        .confirm-modal .modal-content {
+            border-radius: 20px;
+            text-align: center;
+            padding: 20px;
+        }
+        .confirm-icon { font-size: 4rem; color: var(--naranja-hop); margin-bottom: 15px; }
+        .btn-confirm { background-color: var(--naranja-hop); color: white; border-radius: 10px; padding: 8px 25px; font-weight: bold; }
+        
+        /* Botón eliminar pendiente */
+        .btn-eliminar-pendiente {
+            background-color: #ffc107;
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-eliminar-pendiente:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <a href="javascript:history.back()" class="back-btn">←</a>
+    <a href="/" class="home-btn">
+        <span>Volver a HOP</span>
+        <img src="http://localhost:5147/static/images/logohop.jpeg" alt="Logo HOP">
+    </a>
+
+    <div id="toastNotification" class="toast-notification"></div>
+    <div id="contenidoDinamico">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando tu negocio...</p>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div class="modal fade confirm-modal" id="confirmacionModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="confirm-icon"><i class="bi bi-check-circle-fill"></i></div>
+                    <h4 class="fw-bold" id="confirmacionTitulo">¡Exito!</h4>
+                    <p id="confirmacionMensaje" class="text-muted">Operación realizada correctamente</p>
+                    <button type="button" class="btn btn-confirm mt-3" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal personalizado para confirmar eliminación -->
+    <div class="modal fade" id="eliminarConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #dc3545; color: white;">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> Confirmar eliminación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="eliminarMensajeConfirmacion">¿Estás seguro de que deseas eliminar este servicio?</p>
+                    <p class="text-muted small">Se eliminarán también todas las calificaciones, postulaciones y mensajes relacionados.</p>
+                    <div class="alert alert-warning mt-2">
+                        <i class="bi bi-info-circle"></i> Esta acción no se puede deshacer.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="confirmarEliminarBtn">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5147/api';
+        
+        const sesionActiva = localStorage.getItem('hop_session') === 'active';
+        const usuarioActual = JSON.parse(localStorage.getItem('hop_usuario') || 'null');
+
+        if (!sesionActiva || !usuarioActual) {
+            window.location.href = '/login';
+        }
+
+        let misServicios = [];
+        let servicioAEliminar = null;
+        let eliminandoTodo = false;
+
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            const toastDiv = document.getElementById('toastNotification');
+            toastDiv.innerHTML = `<div class="toast-${tipo}"><i class="bi ${tipo === 'success' ? 'bi-check-circle-fill' : (tipo === 'error' ? 'bi-x-circle-fill' : 'bi-exclamation-triangle-fill')}"></i>${mensaje}</div>`;
+            toastDiv.classList.add('show');
+            setTimeout(() => toastDiv.classList.remove('show'), 3000);
+        }
+
+        function mostrarModalConfirmacion(titulo, mensaje) {
+            document.getElementById('confirmacionTitulo').textContent = titulo;
+            document.getElementById('confirmacionMensaje').textContent = mensaje;
+            new bootstrap.Modal(document.getElementById('confirmacionModal')).show();
+        }
+
+        function abrirModalEliminarServicio(servicioId, event) {
+            if (event) event.stopPropagation();
+            servicioAEliminar = servicioId;
+            eliminandoTodo = false;
+            document.getElementById('eliminarMensajeConfirmacion').innerHTML = '¿Estás seguro de que deseas eliminar este servicio?<br><strong>Se eliminarán también todas las calificaciones y postulaciones asociadas.</strong>';
+            new bootstrap.Modal(document.getElementById('eliminarConfirmModal')).show();
+        }
+
+        function abrirModalEliminarNegocio() {
+            servicioAEliminar = null;
+            eliminandoTodo = true;
+            document.getElementById('eliminarMensajeConfirmacion').innerHTML = '⚠️ ¿Estás seguro de que deseas eliminar TODOS tus servicios?<br><strong>Esta acción eliminará todos tus servicios, calificaciones y postulaciones.</strong>';
+            new bootstrap.Modal(document.getElementById('eliminarConfirmModal')).show();
+        }
+
+        async function confirmarEliminacion() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('eliminarConfirmModal'));
+            
+            if (eliminandoTodo) {
+                // Eliminar todo el negocio
+                if (misServicios.length === 0) {
+                    mostrarNotificacion('No hay servicios para eliminar', 'warning');
+                    modal.hide();
+                    return;
+                }
+                
+                try {
+                    let eliminados = 0;
+                    let errores = 0;
+                    
+                    for (const servicio of misServicios) {
+                        const response = await fetch(`${API_BASE}/Servicios/${servicio.id}`, { method: 'DELETE' });
+                        if (response.ok) {
+                            eliminados++;
+                        } else {
+                            errores++;
+                        }
+                    }
+                    
+                    modal.hide();
+                    
+                    if (errores === 0) {
+                        mostrarModalConfirmacion('¡Negocio eliminado!', `Se han eliminado ${eliminados} servicios correctamente`);
+                    } else {
+                        mostrarNotificacion(`Se eliminaron ${eliminados} servicios, pero ${errores} tuvieron errores`, 'warning');
+                    }
+                    
+                    setTimeout(() => cargarMisServicios(), 1500);
+                } catch (error) {
+                    console.error('Error:', error);
+                    modal.hide();
+                    mostrarNotificacion('Error al eliminar el negocio', 'error');
+                }
+            } else {
+                // Eliminar un servicio específico
+                if (!servicioAEliminar) return;
+                
+                try {
+                    const response = await fetch(`${API_BASE}/Servicios/${servicioAEliminar}`, { method: 'DELETE' });
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        modal.hide();
+                        mostrarModalConfirmacion('¡Servicio eliminado!', 'El servicio y sus calificaciones han sido eliminados correctamente');
+                        setTimeout(() => cargarMisServicios(), 1500);
+                    } else {
+                        modal.hide();
+                        mostrarNotificacion(data.error || 'Error al eliminar', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    modal.hide();
+                    mostrarNotificacion('Error al conectar con el servidor', 'error');
+                } finally {
+                    servicioAEliminar = null;
+                }
+            }
+        }
+
+        async function cargarMisServicios() {
+            try {
+                const response = await fetch(`${API_BASE}/Servicios/mis-servicios/${usuarioActual.id}`);
+                if (!response.ok) throw new Error('Error al cargar servicios');
+                misServicios = await response.json();
+                
+                if (misServicios.length > 0) mostrarPanelConServicios();
+                else mostrarPanelSinServicios();
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarPanelSinServicios();
+            }
+        }
+
+        function mostrarPanelConServicios() {
+            let serviciosHtml = '';
+            misServicios.forEach(servicio => {
+                serviciosHtml += `
+                    <div class="servicio-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="servicio-titulo">
+                                    ${escapeHtml(servicio.titulo)}
+                                    
+                                        
+                                </div>
+                                <small class="text-muted">${escapeHtml(servicio.categoria)} • ${escapeHtml(servicio.ubicacion)}</small>
+                                <p class="small mt-2 mb-0">${escapeHtml(servicio.descripcion ? servicio.descripcion.substring(0, 100) : 'Sin descripción')}</p>
+                            </div>
+                            <div>
+                                <span class="badge bg-success">Activo</span>
+                            </div>
+                        </div>
+                        <hr class="my-2">
+                        <div class="d-flex gap-2 justify-content-between align-items-center">
+                            <small class="text-muted">Publicado: ${new Date(servicio.fechaRegistro).toLocaleDateString()}</small>
+                            <div class="d-flex gap-2">
+                                <a href="/negocio/${servicio.id}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i> Ver</a>
+                                <button class="btn btn-sm btn-outline-danger" onclick="abrirModalEliminarServicio(${servicio.id}, event)"><i class="bi bi-trash"></i> Eliminar</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const contenido = `
+                <div class="biz-banner">
+                    <h1 class="panel-title">Panel de Negocios</h1>
+                </div>
+                <div class="container main-container">
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <div class="biz-card">
+                                <h4 class="fw-bold mb-3"><i class="bi bi-briefcase"></i> Mis Servicios (${misServicios.length})</h4>
+                                <div class="servicios-lista">${serviciosHtml}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-box"><div class="stat-number">${misServicios.length}</div><div class="stat-label">Servicios Publicados</div></div>
+                            <button class="btn-post" onclick="window.location.href='/registro_empresa'"><i class="bi bi-plus-circle"></i> Publicar Nuevo Servicio</button>
+                            <button class="btn-danger-custom" onclick="abrirModalEliminarNegocio()"><i class="bi bi-trash"></i> Eliminar todos mis Negocios</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('contenidoDinamico').innerHTML = contenido;
+        }
+
+        function mostrarPanelSinServicios() {
+            document.getElementById('contenidoDinamico').innerHTML = `
+                <div class="container promo-container">
+                    <div class="promo-card shadow">
+                        <div class="promo-header">
+                            <h1 class="fw-bold">¿Tienes un negocio?</h1>
+                            <p>Únete a la red de Hidalgo y haz que tu empresa crezca encontrando al talento ideal en minutos.</p>
+                            <a href="/registro_empresa" class="btn-register-biz">Registrar mi Negocio Ahora</a>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        document.getElementById('confirmarEliminarBtn').addEventListener('click', confirmarEliminacion);
+        
+        window.abrirModalEliminarServicio = abrirModalEliminarServicio;
+        window.abrirModalEliminarNegocio = abrirModalEliminarNegocio;
+        
+        cargarMisServicios();
+    </script>
+</body>
+</html>

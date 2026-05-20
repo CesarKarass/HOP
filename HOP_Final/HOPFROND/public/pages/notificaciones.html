@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificaciones - HOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --azul-oscuro: #001F3F;
+            --naranja-hop: #fb8c00;
+        }
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .navbar-custom {
+            background-color: white;
+            border-bottom: 1px solid #ddd;
+            padding: 0.5rem 2rem;
+        }
+        .navbar-brand img {
+            height: 45px;
+            width: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+        .brand-text {
+            color: var(--azul-oscuro);
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: #555 !important;
+            margin: 0 10px;
+            font-weight: 500;
+        }
+        .btn-menu {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-radius: 5px;
+            padding: 5px 15px;
+            border: none;
+        }
+        .btn-menu:hover {
+            background-color: #002d5c;
+        }
+        .dropdown-menu {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgb(0,0,0,0.1);
+            border: none;
+        }
+        .dropdown-item i {
+            width: 25px;
+            margin-right: 8px;
+        }
+        .badge-notif {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+        .notificacion-card {
+            background: white;
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .notificacion-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .notificacion-no-leida {
+            border-left: 4px solid var(--naranja-hop);
+            background-color: #fff9f0;
+        }
+        .notificacion-icono {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .icono-mensaje { background-color: #e3f2fd; color: #1976d2; }
+        .icono-postulacion { background-color: #e8f5e9; color: #388e3c; }
+        .icono-calificacion { background-color: #fff9c4; color: #f9a825; }
+        .btn-marcar-leida {
+            background: none;
+            border: none;
+            color: #6c757d;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .btn-marcar-leida:hover { color: var(--naranja-hop); }
+        .filtro-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 5px 15px;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .filtro-btn.active {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-color: var(--azul-oscuro);
+        }
+        
+        /* Estilos del Chat Modal */
+        .chat-modal .modal-dialog {
+            max-width: 500px;
+            margin: 1.75rem auto;
+        }
+        .chat-modal .modal-content {
+            border-radius: 20px;
+            border: none;
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-modal .modal-header {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 15px 20px;
+        }
+        .chat-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .mensaje-bubble {
+            margin-bottom: 15px;
+            display: flex;
+        }
+        .mensaje-propio {
+            justify-content: flex-end;
+        }
+        .mensaje-otro {
+            justify-content: flex-start;
+        }
+        .bubble {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+        }
+        .bubble-propio {
+            background-color: var(--naranja-hop);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        .bubble-otro {
+            background-color: white;
+            color: #333;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .mensaje-fecha {
+            font-size: 0.7rem;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        .chat-footer {
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 20px 20px;
+        }
+        .chat-input-group {
+            display: flex;
+            gap: 10px;
+        }
+        .chat-input {
+            flex: 1;
+            border: 1px solid #dee2e6;
+            border-radius: 25px;
+            padding: 10px 15px;
+            resize: none;
+            font-family: inherit;
+        }
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--naranja-hop);
+        }
+        .btn-enviar-chat {
+            background-color: var(--naranja-hop);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-enviar-chat:hover {
+            background-color: #e67e00;
+            transform: scale(1.05);
+        }
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-avatar {
+            width: 45px;
+            height: 45px;
+            background-color: var(--naranja-hop);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        .sin-mensajes {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+        
+        /* Estilos del Modal de Enviar Mensaje */
+        .enviar-mensaje-modal .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        .enviar-mensaje-modal .modal-header {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        .textarea-mensaje {
+            border-radius: 15px;
+            border: 1px solid #dee2e6;
+            resize: none;
+            font-family: inherit;
+        }
+        .textarea-mensaje:focus {
+            outline: none;
+            border-color: var(--naranja-hop);
+        }
+        .btn-enviar-mensaje {
+            background-color: var(--naranja-hop);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .btn-enviar-mensaje:hover {
+            background-color: #e67e00;
+        }
+        
+        .stats-compact.hidden {
+            display: none;
+        }
+        .stats-compact {
+            background: white;
+            border-radius: 15px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--naranja-hop);
+        }
+        .promedio-numero {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--azul-oscuro);
+            line-height: 1;
+        }
+        .promedio-estrellas {
+            font-size: 0.9rem;
+            color: #ffc107;
+        }
+        .rating-row-compact {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+        .rating-label {
+            width: 70px;
+            font-size: 0.75rem;
+        }
+        .progress-compact {
+            flex: 1;
+            height: 5px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 0 8px;
+        }
+        .progress-bar-compact {
+            height: 100%;
+            background-color: var(--naranja-hop);
+            border-radius: 5px;
+        }
+        .rating-percent {
+            width: 35px;
+            text-align: right;
+            font-size: 0.7rem;
+            color: #666;
+        }
+        .estrellas-calificacion {
+            font-size: 1rem;
+            color: #ffc107;
+        }
+        .mensaje-preview {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+        }
+        /* Modal para ver postulación */
+        .postulacion-modal .modal-content {
+            border-radius: 20px;
+        }
+        .postulacion-modal .modal-header {
+            background-color: var(--azul-oscuro);
+            color: white;
+        }
+        .btn-aceptar {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+        }
+        .btn-rechazar {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+        }
+        .loading-overlay {
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner-sm {
+            width: 1rem;
+            height: 1rem;
+            border-width: 0.15em;
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast-success { background-color: #28a745; color: white; border-radius: 10px; padding: 12px 20px; }
+        .toast-error { background-color: #dc3545; color: white; border-radius: 10px; padding: 12px 20px; }
+        .toast-warning { background-color: #ffc107; color: #333; border-radius: 10px; padding: 12px 20px; }
+        
+        /* Botón eliminar notificación */
+        .btn-eliminar-notif {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-eliminar-notif:hover {
+            color: #c82333;
+            transform: scale(1.1);
+        }
+        
+        /* Modal de confirmación para eliminar */
+        .confirmar-eliminar-modal .modal-content {
+            border-radius: 20px;
+            text-align: center;
+        }
+        .confirmar-eliminar-modal .modal-header {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        .confirmar-eliminar-modal .btn-confirmar {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+        }
+        .confirmar-eliminar-modal .btn-confirmar:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="http://localhost:5147/static/images/logohop.jpeg" alt="HOP">
+                <span class="brand-text">HOP</span>
+            </a>
+            <div class="navbar-nav mx-auto">
+                <a class="nav-link" href="/inicio">Inicio</a>
+                <a class="nav-link" href="/">HOP</a>
+                <a class="nav-link" href="/privacidad">Privacidad</a>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-menu shadow-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Menu
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/miperfil"><i class="bi bi-person-circle"></i> Mi Perfil</a></li>
+                    <li><a class="dropdown-item" href="/micv"><i class="bi bi-file-text"></i> Mi CV</a></li>
+                    <li><a class="dropdown-item" href="/minegocio"><i class="bi bi-building"></i> Mi Negocio</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item fw-bold" href="/notificaciones"><i class="bi bi-bell-fill"></i> Notificaciones <span id="menuNotifBadge" class="badge-notif" style="display: none;">0</span></a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/configuracion"><i class="bi bi-gear"></i> Configuracion</a></li>
+                    <li><a class="dropdown-item" href="/ayuda"><i class="bi bi-question-circle"></i> Ayuda</a></li>
+                    <li><a class="dropdown-item" href="/privacidad"><i class="bi bi-shield-lock"></i> Privacidad</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Cerrar Sesion</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="toastNotification" class="toast-notification"></div>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 style="color: var(--azul-oscuro);">
+                <i class="bi bi-bell-fill" style="color: var(--naranja-hop);"></i> Notificaciones
+            </h2>
+            <div>
+                <button class="filtro-btn active" data-filtro="todas">Todas</button>
+                <button class="filtro-btn" data-filtro="no-leidas">No leidas</button>
+                <button class="filtro-btn" data-filtro="mensajes">Mensajes</button>
+                <button class="filtro-btn" data-filtro="postulaciones">Postulaciones</button>
+                <button class="filtro-btn" data-filtro="calificaciones">Calificaciones</button>
+            </div>
+        </div>
+
+        <div id="estadisticasContainer" class="stats-compact hidden">
+            <div class="row align-items-center">
+                <div class="col-3 text-center">
+                    <div class="promedio-numero" id="promedioCalificaciones">0.0</div>
+                    <div class="promedio-estrellas" id="promedioEstrellas"></div>
+                    <small class="text-muted" id="totalCalificaciones">0 calif.</small>
+                </div>
+                <div class="col-9">
+                    <div class="rating-row-compact">
+                        <span class="rating-label">5 ★</span>
+                        <div class="progress-compact"><div class="progress-bar-compact" id="barra5" style="width: 0%"></div></div>
+                        <span class="rating-percent" id="porcentaje5">0%</span>
+                    </div>
+                    <div class="rating-row-compact">
+                        <span class="rating-label">4 ★</span>
+                        <div class="progress-compact"><div class="progress-bar-compact" id="barra4" style="width: 0%"></div></div>
+                        <span class="rating-percent" id="porcentaje4">0%</span>
+                    </div>
+                    <div class="rating-row-compact">
+                        <span class="rating-label">3 ★</span>
+                        <div class="progress-compact"><div class="progress-bar-compact" id="barra3" style="width: 0%"></div></div>
+                        <span class="rating-percent" id="porcentaje3">0%</span>
+                    </div>
+                    <div class="rating-row-compact">
+                        <span class="rating-label">2 ★</span>
+                        <div class="progress-compact"><div class="progress-bar-compact" id="barra2" style="width: 0%"></div></div>
+                        <span class="rating-percent" id="porcentaje2">0%</span>
+                    </div>
+                    <div class="rating-row-compact">
+                        <span class="rating-label">1 ★</span>
+                        <div class="progress-compact"><div class="progress-bar-compact" id="barra1" style="width: 0%"></div></div>
+                        <span class="rating-percent" id="porcentaje1">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="notificacionesLista">
+            <div class="text-center py-5" id="loadingNotif">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Cargando notificaciones...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Chat -->
+    <div class="modal fade chat-modal" id="chatModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="chat-header-info">
+                        <div class="chat-avatar" id="chatAvatar">U</div>
+                        <div>
+                            <h5 class="mb-0" id="chatNombre">Usuario</h5>
+                            <small class="opacity-75" id="chatEstado">En linea</small>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="chat-body" id="chatBody">
+                    <div class="sin-mensajes">
+                        <i class="bi bi-chat-dots" style="font-size: 2rem;"></i>
+                        <p class="mt-2">No hay mensajes aún</p>
+                    </div>
+                </div>
+                <div class="chat-footer">
+                    <div class="chat-input-group">
+                        <textarea id="chatInput" class="chat-input" rows="1" placeholder="Escribe un mensaje..." onkeypress="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); enviarMensajeChat(); }"></textarea>
+                        <button class="btn-enviar-chat" onclick="enviarMensajeChat()">
+                            <i class="bi bi-send-fill"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Enviar Mensaje -->
+    <div class="modal fade enviar-mensaje-modal" id="enviarMensajeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-chat-dots"></i> Enviar mensaje</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Para:</label>
+                        <p id="destinatarioNombre" class="mb-2">Usuario</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mensaje:</label>
+                        <textarea id="mensajeTexto" class="form-control textarea-mensaje" rows="4" placeholder="Escribe tu mensaje..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-enviar-mensaje" id="confirmarEnviarMsg">
+                        <i class="bi bi-send"></i> Enviar mensaje
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para ver detalles de postulación -->
+    <div class="modal fade postulacion-modal" id="postulacionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-person-check"></i> Detalles de postulación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="postulacionModalBody">
+                    <div id="postulacionLoading" class="loading-overlay" style="display: none;">
+                        <div class="spinner-border spinner-sm text-primary" role="status"></div>
+                        <p class="mt-2">Cargando detalles...</p>
+                    </div>
+                    <div id="postulacionContent">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Candidato</label>
+                            <p id="postulacionCandidato" class="mb-2">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Mensaje</label>
+                            <p id="postulacionMensaje" class="mb-2">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">CV Adjunto</label>
+                            <div id="postulacionCvLink"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Servicio</label>
+                            <p id="postulacionServicio" class="mb-2">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Fecha de postulación</label>
+                            <p id="postulacionFecha" class="mb-2">-</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Estado actual</label>
+                            <span id="postulacionEstado" class="badge bg-warning">Pendiente</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn-aceptar" id="aceptarPostulacionBtn" style="display: none;">Aceptar</button>
+                    <button type="button" class="btn-rechazar" id="rechazarPostulacionBtn" style="display: none;">Rechazar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para eliminar notificación -->
+    <div class="modal fade confirmar-eliminar-modal" id="confirmarEliminarModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-exclamation-triangle-fill"></i> Eliminar notificación</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <i class="bi bi-trash" style="font-size: 3rem; color: #dc3545;"></i>
+                    <p class="mt-3 fw-bold">¿Estás seguro de que deseas eliminar esta notificación?</p>
+                    <p class="text-muted">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-confirmar" id="confirmarEliminarBtn">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5147/api';
+        const STATIC_BASE = 'http://localhost:5147';
+        let usuarioActual = null;
+        let notificaciones = [];
+        let usuarioChatActual = null;
+        let mensajesChat = [];
+        let destinatarioActual = null;
+        let postulacionActual = null;
+        let notificacionAEliminar = null;
+
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            const toastDiv = document.getElementById('toastNotification');
+            toastDiv.innerHTML = `<div class="toast-${tipo}"><i class="bi ${tipo === 'success' ? 'bi-check-circle-fill' : (tipo === 'error' ? 'bi-x-circle-fill' : 'bi-exclamation-triangle-fill')}"></i>${mensaje}</div>`;
+            toastDiv.classList.add('show');
+            setTimeout(() => toastDiv.classList.remove('show'), 3000);
+        }
+
+        function verificarSesion() {
+            const userStr = localStorage.getItem('hop_usuario');
+            const session = localStorage.getItem('hop_session');
+            if (userStr && session === 'active') {
+                usuarioActual = JSON.parse(userStr);
+                return true;
+            }
+            window.location.href = '/login';
+            return false;
+        }
+
+        async function actualizarContadorMenu() {
+            if (!usuarioActual) return;
+            try {
+                const response = await fetch(`${API_BASE}/Chat/notificaciones/${usuarioActual.id}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const noLeidas = data.filter(n => !n.leida && (n.tipo === 'mensaje' || n.tipo === 'calificacion' || n.tipo === 'postulacion')).length;
+                    const badge = document.getElementById('menuNotifBadge');
+                    if (badge) {
+                        badge.style.display = noLeidas > 0 ? 'inline-block' : 'none';
+                        badge.textContent = noLeidas;
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        async function cargarNotificaciones() {
+            if (!usuarioActual) return;
+            try {
+                const response = await fetch(`${API_BASE}/Chat/notificaciones/${usuarioActual.id}`);
+                if (response.ok) {
+                    let todas = await response.json();
+                    
+                    let filtradas = todas.filter(n => {
+                        if (n.tipo !== 'mensaje' && n.tipo !== 'calificacion' && n.tipo !== 'postulacion') return false;
+                        if (n.tipo === 'mensaje') {
+                            const tieneNombreReal = n.emisorNombre && 
+                                                   n.emisorNombre.length > 1 && 
+                                                   isNaN(parseInt(n.emisorNombre));
+                            return tieneNombreReal;
+                        }
+                        return true;
+                    });
+                    
+                    notificaciones = filtradas;
+                    notificaciones.sort((a, b) => new Date(b.fechaCreacion) - new Date(a.fechaCreacion));
+                    
+                    const activeFilter = document.querySelector('.filtro-btn.active').dataset.filtro;
+                    mostrarNotificaciones(activeFilter);
+                    await actualizarContadorMenu();
+                } else {
+                    mostrarMensajeError();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensajeError();
+            }
+        }
+
+        function abrirModalEliminar(notificacionId, event) {
+            event.stopPropagation();
+            notificacionAEliminar = notificacionId;
+            new bootstrap.Modal(document.getElementById('confirmarEliminarModal')).show();
+        }
+
+        async function confirmarEliminarNotificacion() {
+            if (!notificacionAEliminar) return;
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmarEliminarModal'));
+            
+            try {
+                console.log(`Eliminando notificación ID: ${notificacionAEliminar}`);
+                
+                const response = await fetch(`${API_BASE}/Notificaciones/${notificacionAEliminar}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    modal.hide();
+                    mostrarNotificacion('Notificación eliminada', 'success');
+                    // Recargar notificaciones después de eliminar
+                    setTimeout(() => cargarNotificaciones(), 500);
+                } else {
+                    throw new Error(data.error || 'Error al eliminar');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                modal.hide();
+                mostrarNotificacion(error.message || 'Error al eliminar la notificación', 'error');
+            } finally {
+                notificacionAEliminar = null;
+            }
+        }
+
+        function mostrarNotificaciones(filtro) {
+            const container = document.getElementById('notificacionesLista');
+            const statsContainer = document.getElementById('estadisticasContainer');
+            
+            let filtradas = [...notificaciones];
+            
+            if (filtro === 'calificaciones') {
+                statsContainer.classList.remove('hidden');
+                cargarEstadisticas();
+                filtradas = filtradas.filter(n => n.tipo === 'calificacion');
+            } else {
+                statsContainer.classList.add('hidden');
+            }
+            
+            if (filtro === 'no-leidas') {
+                filtradas = filtradas.filter(n => !n.leida);
+            } else if (filtro === 'mensajes') {
+                filtradas = filtradas.filter(n => n.tipo === 'mensaje');
+            } else if (filtro === 'postulaciones') {
+                filtradas = filtradas.filter(n => n.tipo === 'postulacion');
+            } else if (filtro === 'calificaciones') {
+                filtradas = filtradas.filter(n => n.tipo === 'calificacion');
+            }
+            
+            if (filtradas.length === 0) {
+                let mensajeVacio = '';
+                if (filtro === 'mensajes') mensajeVacio = 'No hay mensajes';
+                else if (filtro === 'postulaciones') mensajeVacio = 'No hay postulaciones';
+                else if (filtro === 'calificaciones') mensajeVacio = 'No hay calificaciones';
+                else mensajeVacio = 'No hay notificaciones';
+                
+                container.innerHTML = `<div class="text-center py-5"><i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i><p class="text-muted mt-2">${mensajeVacio}</p></div>`;
+                return;
+            }
+            
+            container.innerHTML = filtradas.map(notif => {
+                let contenidoExtra = '';
+                let titulo = notif.contenido;
+                let iconoClass = 'icono-sistema';
+                let icono = '<i class="bi bi-bell"></i>';
+                
+                if (notif.tipo === 'mensaje' && notif.emisorNombre) {
+                    titulo = `Mensaje de ${notif.emisorNombre}`;
+                    iconoClass = 'icono-mensaje';
+                    icono = '<i class="bi bi-chat-dots"></i>';
+                    if (notif.mensajeContenido) {
+                        contenidoExtra = `<div class="mensaje-preview mt-2">
+                            <small class="text-muted">Mensaje:</small>
+                            <p class="mb-0 small">"${escapeHtml(notif.mensajeContenido.substring(0, 80))}${notif.mensajeContenido.length > 80 ? '...' : ''}"</p>
+                        </div>`;
+                    }
+                }
+                
+                if (notif.tipo === 'postulacion') {
+                    titulo = `${notif.contenido}`;
+                    iconoClass = 'icono-postulacion';
+                    icono = '<i class="bi bi-person-plus"></i>';
+                    contenidoExtra = `<div class="mt-2">
+                        <small class="text-muted">Haz clic para ver detalles</small>
+                    </div>`;
+                }
+                
+                if (notif.tipo === 'calificacion' && notif.puntuacion) {
+                    titulo = `Calificacion de ${notif.calificadorNombre || 'Usuario'}`;
+                    iconoClass = 'icono-calificacion';
+                    icono = '<i class="bi bi-star-fill"></i>';
+                    const estrellas = '★'.repeat(notif.puntuacion) + '☆'.repeat(5 - notif.puntuacion);
+                    contenidoExtra = `<div class="mt-2">
+                        <span class="estrellas-calificacion">${estrellas}</span>
+                        ${notif.comentarioCalificacion ? `<p class="small text-muted mt-1">"${escapeHtml(notif.comentarioCalificacion)}"</p>` : ''}
+                    </div>`;
+                }
+                
+                return `
+                <div class="notificacion-card p-3 ${!notif.leida ? 'notificacion-no-leida' : ''}" onclick="abrirNotificacion(${notif.id}, '${notif.tipo}')">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="notificacion-icono ${iconoClass}">
+                            ${icono}
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-1 fw-bold">${escapeHtml(titulo)}</p>
+                            ${contenidoExtra}
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <small class="text-muted">${formatFecha(notif.fechaCreacion)}</small>
+                                <button class="btn-eliminar-notif" onclick="abrirModalEliminar(${notif.id}, event)" title="Eliminar notificación">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${!notif.leida ? `<button class="btn-marcar-leida" onclick="event.stopPropagation(); marcarComoLeida(${notif.id}, '${notif.tipo}')"><i class="bi bi-check-circle"></i></button>` : `<span class="text-muted small"><i class="bi bi-check-circle-fill text-success"></i></span>`}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function abrirNotificacion(id, tipo) {
+            const notif = notificaciones.find(n => n.id === id);
+            if (!notif) return;
+            
+            if (!notif.leida) {
+                await marcarComoLeida(id, tipo);
+                notif.leida = true;
+                mostrarNotificaciones(document.querySelector('.filtro-btn.active').dataset.filtro);
+                await actualizarContadorMenu();
+            }
+            
+            if (tipo === 'mensaje') {
+                usuarioChatActual = {
+                    id: notif.emisorId,
+                    nombre: notif.emisorNombre || 'Usuario'
+                };
+                document.getElementById('chatNombre').textContent = usuarioChatActual.nombre;
+                document.getElementById('chatAvatar').textContent = usuarioChatActual.nombre.charAt(0).toUpperCase();
+                await cargarConversacion();
+                const modal = new bootstrap.Modal(document.getElementById('chatModal'));
+                modal.show();
+            } else if (tipo === 'postulacion') {
+                await cargarDetallePostulacion(notif.referenciaId);
+            }
+        }
+
+        async function cargarDetallePostulacion(postulacionId) {
+            if (!postulacionId) {
+                mostrarNotificacion('ID de postulación no válido', 'error');
+                return;
+            }
+            
+            const loadingDiv = document.getElementById('postulacionLoading');
+            const contentDiv = document.getElementById('postulacionContent');
+            
+            loadingDiv.style.display = 'block';
+            contentDiv.style.display = 'none';
+            
+            try {
+                console.log(`Buscando postulación con ID: ${postulacionId}`);
+                
+                let response = await fetch(`${API_BASE}/Postulaciones/${postulacionId}`);
+                let postulacion = null;
+                
+                if (response.ok) {
+                    postulacion = await response.json();
+                    console.log('Postulación encontrada por ID:', postulacion);
+                } else {
+                    console.log('No encontrada por ID, buscando en recibidas...');
+                    const recibidasResponse = await fetch(`${API_BASE}/Postulaciones/recibidas/${usuarioActual.id}`);
+                    if (recibidasResponse.ok) {
+                        const postulaciones = await recibidasResponse.json();
+                        console.log('Postulaciones recibidas:', postulaciones);
+                        postulacion = postulaciones.find(p => p.id === postulacionId);
+                        if (postulacion) {
+                            console.log('Postulación encontrada en recibidas:', postulacion);
+                        }
+                    }
+                }
+                
+                if (postulacion) {
+                    document.getElementById('postulacionCandidato').innerHTML = `<strong>${escapeHtml(postulacion.prestadorNombre)}</strong>`;
+                    document.getElementById('postulacionMensaje').textContent = postulacion.mensaje || 'Sin mensaje';
+                    document.getElementById('postulacionServicio').textContent = postulacion.servicioTitulo || 'No especificado';
+                    document.getElementById('postulacionFecha').textContent = new Date(postulacion.fechaPostulacion).toLocaleString();
+                    
+                    let estadoClass = 'bg-warning';
+                    let estadoText = 'Pendiente';
+                    if (postulacion.estado === 'aceptado') { estadoClass = 'bg-success'; estadoText = 'Aceptado'; }
+                    if (postulacion.estado === 'rechazado') { estadoClass = 'bg-danger'; estadoText = 'Rechazado'; }
+                    document.getElementById('postulacionEstado').className = `badge ${estadoClass}`;
+                    document.getElementById('postulacionEstado').textContent = estadoText;
+                    
+                    if (postulacion.cvRuta && postulacion.cvRuta !== '') {
+                        document.getElementById('postulacionCvLink').innerHTML = `
+                            <a href="${STATIC_BASE}${postulacion.cvRuta}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-file-earmark-pdf"></i> Ver CV
+                            </a>
+                        `;
+                    } else {
+                        document.getElementById('postulacionCvLink').innerHTML = '<span class="text-muted">No se adjuntó CV</span>';
+                    }
+                    
+                    postulacionActual = postulacion;
+                    
+                    const aceptarBtn = document.getElementById('aceptarPostulacionBtn');
+                    const rechazarBtn = document.getElementById('rechazarPostulacionBtn');
+                    
+                    if (postulacion.estado === 'pendiente') {
+                        aceptarBtn.style.display = 'inline-block';
+                        rechazarBtn.style.display = 'inline-block';
+                    } else {
+                        aceptarBtn.style.display = 'none';
+                        rechazarBtn.style.display = 'none';
+                    }
+                    
+                    loadingDiv.style.display = 'none';
+                    contentDiv.style.display = 'block';
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('postulacionModal'));
+                    modal.show();
+                } else {
+                    loadingDiv.style.display = 'none';
+                    mostrarNotificacion('No se encontraron detalles de la postulación', 'warning');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                loadingDiv.style.display = 'none';
+                mostrarNotificacion('Error al cargar detalles de la postulación', 'error');
+            }
+        }
+
+        async function cambiarEstadoPostulacion(estado) {
+            if (!postulacionActual) return;
+            
+            const btn = estado === 'aceptado' ? document.getElementById('aceptarPostulacionBtn') : document.getElementById('rechazarPostulacionBtn');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-sm me-1"></span> Procesando...';
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('estado', estado);
+                
+                const response = await fetch(`${API_BASE}/Postulaciones/actualizar-estado/${postulacionActual.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    mostrarNotificacion(`Postulación ${estado === 'aceptado' ? 'aceptada' : 'rechazada'} correctamente`, 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('postulacionModal')).hide();
+                    cargarNotificaciones();
+                } else {
+                    throw new Error(data.error || 'Error al actualizar estado');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion(error.message || 'Error al actualizar el estado', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+
+        async function cargarConversacion() {
+            if (!usuarioActual || !usuarioChatActual) return;
+            
+            const chatBody = document.getElementById('chatBody');
+            chatBody.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-2">Cargando mensajes...</p></div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/Chat/conversacion/${usuarioActual.id}/${usuarioChatActual.id}`);
+                if (response.ok) {
+                    mensajesChat = await response.json();
+                    mostrarMensajesChat();
+                } else {
+                    chatBody.innerHTML = '<div class="sin-mensajes"><i class="bi bi-chat-dots" style="font-size: 2rem;"></i><p class="mt-2">No hay mensajes aún</p></div>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                chatBody.innerHTML = '<div class="sin-mensajes"><i class="bi bi-exclamation-triangle" style="font-size: 2rem;"></i><p class="mt-2">Error al cargar mensajes</p></div>';
+            }
+        }
+
+        function mostrarMensajesChat() {
+            const chatBody = document.getElementById('chatBody');
+            
+            if (!mensajesChat || mensajesChat.length === 0) {
+                chatBody.innerHTML = '<div class="sin-mensajes"><i class="bi bi-chat-dots" style="font-size: 2rem;"></i><p class="mt-2">No hay mensajes aún</p></div>';
+                return;
+            }
+            
+            chatBody.innerHTML = mensajesChat.map(msg => `
+                <div class="mensaje-bubble ${msg.esPropio ? 'mensaje-propio' : 'mensaje-otro'}">
+                    <div class="bubble ${msg.esPropio ? 'bubble-propio' : 'bubble-otro'}">
+                        <div class="mensaje-texto">${escapeHtml(msg.mensaje)}</div>
+                        <div class="mensaje-fecha">${formatFecha(msg.fechaEnvio)}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function enviarMensajeChat() {
+            const input = document.getElementById('chatInput');
+            const mensaje = input.value.trim();
+            
+            if (!mensaje) return;
+            if (!usuarioChatActual) return;
+            
+            input.value = '';
+            input.style.height = 'auto';
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emisorId', usuarioActual.id);
+                formData.append('receptorId', usuarioChatActual.id);
+                formData.append('mensaje', mensaje);
+                
+                const response = await fetch(`${API_BASE}/Chat/enviar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    mensajesChat.push({
+                        id: Date.now(),
+                        emisorId: usuarioActual.id,
+                        emisorNombre: usuarioActual.nombre,
+                        mensaje: mensaje,
+                        fechaEnvio: new Date().toISOString(),
+                        esPropio: true
+                    });
+                    mostrarMensajesChat();
+                    cargarNotificaciones();
+                } else {
+                    mostrarNotificacion('Error al enviar mensaje', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error de conexión', 'error');
+            }
+        }
+
+        async function marcarComoLeida(id, tipo) {
+            try {
+                let endpoint = '';
+                if (tipo === 'mensaje') {
+                    endpoint = `${API_BASE}/Chat/marcar-leida/${id}`;
+                } else if (tipo === 'calificacion') {
+                    endpoint = `${API_BASE}/Chat/marcar-calificacion-leida/${id}`;
+                } else if (tipo === 'postulacion') {
+                    endpoint = `${API_BASE}/Postulaciones/marcar-leida/${id}`;
+                } else {
+                    return false;
+                }
+                await fetch(endpoint, { method: 'PUT' });
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+
+        async function cargarEstadisticas() {
+            if (!usuarioActual) return;
+            try {
+                const response = await fetch(`${API_BASE}/Calificaciones/estadisticas/${usuarioActual.id}`);
+                if (response.ok) {
+                    const stats = await response.json();
+                    if (stats.total > 0) {
+                        document.getElementById('promedioCalificaciones').textContent = stats.promedio;
+                        document.getElementById('totalCalificaciones').textContent = `${stats.total} calif.`;
+                        const estrellas = '★'.repeat(Math.round(stats.promedio)) + '☆'.repeat(5 - Math.round(stats.promedio));
+                        document.getElementById('promedioEstrellas').innerHTML = estrellas;
+                        
+                        const total = stats.total;
+                        const porcentajes = {5: (stats.estrellas5/total)*100, 4: (stats.estrellas4/total)*100, 3: (stats.estrellas3/total)*100, 2: (stats.estrellas2/total)*100, 1: (stats.estrellas1/total)*100};
+                        
+                        ['5','4','3','2','1'].forEach(num => {
+                            document.getElementById(`barra${num}`).style.width = `${porcentajes[num]}%`;
+                            document.getElementById(`porcentaje${num}`).textContent = `${Math.round(porcentajes[num])}%`;
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function formatFecha(fechaStr) {
+            const fecha = new Date(fechaStr);
+            const ahora = new Date();
+            const diff = ahora - fecha;
+            const minutos = Math.floor(diff / 60000);
+            const horas = Math.floor(diff / 3600000);
+            const dias = Math.floor(diff / 86400000);
+            
+            if (minutos < 1) return 'Justo ahora';
+            if (minutos < 60) return `Hace ${minutos} min`;
+            if (horas < 24) return `Hace ${horas} h`;
+            if (dias < 7) return `Hace ${dias} d`;
+            return fecha.toLocaleDateString();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function mostrarMensajeError() {
+            const container = document.getElementById('notificacionesLista');
+            container.innerHTML = `<div class="text-center py-5"><i class="bi bi-bell-slash" style="font-size: 3rem; color: #ccc;"></i><p class="text-muted mt-2">No se pudieron cargar las notificaciones</p></div>`;
+        }
+
+        window.mostrarModalEnviarMensaje = function(receptorId, receptorNombre) {
+            destinatarioActual = { id: receptorId, nombre: receptorNombre };
+            document.getElementById('destinatarioNombre').innerHTML = `<strong>${escapeHtml(receptorNombre)}</strong>`;
+            document.getElementById('mensajeTexto').value = '';
+            const modal = new bootstrap.Modal(document.getElementById('enviarMensajeModal'));
+            modal.show();
+        };
+
+        document.getElementById('confirmarEnviarMsg').addEventListener('click', async () => {
+            const mensaje = document.getElementById('mensajeTexto').value.trim();
+            if (!mensaje) {
+                mostrarNotificacion('Escribe un mensaje', 'warning');
+                return;
+            }
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emisorId', usuarioActual.id);
+                formData.append('receptorId', destinatarioActual.id);
+                formData.append('mensaje', mensaje);
+                
+                const response = await fetch(`${API_BASE}/Chat/enviar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    mostrarNotificacion('Mensaje enviado correctamente', 'success');
+                    bootstrap.Modal.getInstance(document.getElementById('enviarMensajeModal')).hide();
+                    cargarNotificaciones();
+                } else {
+                    mostrarNotificacion('Error al enviar mensaje', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error de conexión', 'error');
+            }
+        });
+
+        document.getElementById('aceptarPostulacionBtn').addEventListener('click', () => cambiarEstadoPostulacion('aceptado'));
+        document.getElementById('rechazarPostulacionBtn').addEventListener('click', () => cambiarEstadoPostulacion('rechazado'));
+        document.getElementById('confirmarEliminarBtn').addEventListener('click', confirmarEliminarNotificacion);
+
+        document.querySelectorAll('.filtro-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                mostrarNotificaciones(btn.dataset.filtro);
+            });
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            localStorage.removeItem('hop_session');
+            localStorage.removeItem('hop_usuario');
+            window.location.href = '/';
+        });
+
+        document.getElementById('chatInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        window.enviarMensajeChat = enviarMensajeChat;
+        window.abrirNotificacion = abrirNotificacion;
+        window.marcarComoLeida = marcarComoLeida;
+        window.abrirModalEliminar = abrirModalEliminar;
+
+        if (verificarSesion()) {
+            cargarNotificaciones();
+        }
+    </script>
+</body>
+</html>

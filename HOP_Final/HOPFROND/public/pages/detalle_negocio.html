@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle del Servicio - HOP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root { 
+            --azul-oscuro: #001F3F; 
+            --naranja-hop: #fb8c00; 
+        }
+        body { 
+            background-color: #f8f9fa; 
+        }
+        .nav-detail { 
+            background: white; 
+            border-bottom: 1px solid #ddd; 
+            padding: 1rem; 
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .servicio-carousel-container {
+            margin: 0 auto;
+            border-radius: 0;
+            overflow: hidden;
+            position: relative;
+            background: var(--azul-oscuro);
+        }
+        .servicio-carousel {
+            margin: 0 auto;
+        }
+        .servicio-carousel .carousel-item {
+            height: 400px;
+        }
+        .servicio-carousel .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: var(--azul-oscuro);
+        }
+        .servicio-carousel .carousel-control-prev,
+        .servicio-carousel .carousel-control-next {
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            margin: 0 15px;
+        }
+        .servicio-carousel .carousel-control-prev-icon,
+        .servicio-carousel .carousel-control-next-icon {
+            width: 25px;
+            height: 25px;
+        }
+        .servicio-carousel .carousel-indicators {
+            bottom: 15px;
+        }
+        .servicio-carousel .carousel-indicators button {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin: 0 5px;
+            background-color: white;
+            opacity: 0.7;
+        }
+        .servicio-carousel .carousel-indicators button.active {
+            background-color: var(--naranja-hop);
+            opacity: 1;
+        }
+        .info-header {
+            background: linear-gradient(135deg, var(--azul-oscuro) 0%, #001F3F 100%);
+            color: white;
+            padding: 30px 0;
+            margin-top: -10px;
+            position: relative;
+            z-index: 5;
+        }
+        .action-card { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 35px; 
+            margin-top: -30px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            position: relative;
+            z-index: 10;
+        }
+        .btn-hop { 
+            background-color: var(--azul-oscuro); 
+            color: white; 
+            font-weight: bold; 
+            transition: 0.3s; 
+            padding: 12px 25px;
+            border-radius: 12px;
+        }
+        .btn-hop:hover { 
+            background-color: #002d5c; 
+            color: white; 
+            transform: translateY(-2px); 
+        }
+        .btn-edit { 
+            border: 2px solid var(--naranja-hop); 
+            color: var(--naranja-hop); 
+            font-weight: bold; 
+            background: white;
+            padding: 12px 25px;
+            border-radius: 12px;
+        }
+        .btn-edit:hover { 
+            background: var(--naranja-hop); 
+            color: white; 
+        }
+        .btn-chat {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        .btn-chat:hover {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-calificar {
+            background-color: #fff9c4;
+            color: #f9a825;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: bold;
+        }
+        .btn-calificar:hover {
+            background-color: #f9a825;
+            color: white;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+        }
+        .edit-form {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        .edit-form.show {
+            display: block;
+        }
+        .star-rating-modal {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #ddd;
+            text-align: center;
+        }
+        .star-rating-modal .selected {
+            color: #ffc107;
+        }
+        .modal-content {
+            border-radius: 20px;
+        }
+        .modal-header {
+            background-color: var(--azul-oscuro);
+            color: white;
+            border-radius: 20px 20px 0 0;
+        }
+        .toast-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast-success { background-color: #28a745; color: white; border-radius: 10px; padding: 12px 20px; }
+        .toast-error { background-color: #dc3545; color: white; border-radius: 10px; padding: 12px 20px; }
+        .toast-warning { background-color: #ffc107; color: #333; border-radius: 10px; padding: 12px 20px; }
+        .confirm-modal .modal-content {
+            border-radius: 20px;
+            text-align: center;
+            padding: 20px;
+        }
+        .confirm-icon { font-size: 4rem; color: var(--naranja-hop); margin-bottom: 15px; }
+        .btn-confirm { background-color: var(--naranja-hop); color: white; border-radius: 10px; padding: 8px 25px; font-weight: bold; }
+        .loading-spinner { text-align: center; padding: 50px; }
+        .badge-custom {
+            background: rgba(0,0,0,0.6);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .galeria-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .galeria-preview .imagen-item {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #dee2e6;
+            transition: 0.2s;
+        }
+        .galeria-preview .imagen-item:hover {
+            border-color: var(--naranja-hop);
+            transform: scale(1.02);
+        }
+        .galeria-preview .imagen-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .galeria-preview .btn-eliminar-img {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .galeria-preview .btn-eliminar-img:hover {
+            background: #dc3545;
+            transform: scale(1.1);
+        }
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+        .upload-area:hover {
+            border-color: var(--naranja-hop);
+            background-color: #fff8f0;
+        }
+        .btn-volver {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            color: #495057;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .btn-volver:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        .postular-modal .modal-content {
+            border-radius: 20px;
+        }
+        .postular-modal .modal-header {
+            background-color: var(--azul-oscuro);
+            color: white;
+        }
+        .btn-enviar-postulacion {
+            background-color: var(--naranja-hop);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .btn-enviar-postulacion:hover {
+            background-color: #e67e00;
+        }
+        .cv-select {
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            width: 100%;
+        }
+        .footer-contact {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            padding: 20px 0;
+            margin-top: 60px;
+        }
+        .contact-link {
+            color: var(--azul-oscuro);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .contact-link:hover {
+            color: var(--naranja-hop);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-detail">
+        <div class="container d-flex justify-content-between align-items-center">
+            <a href="javascript:history.back()" class="text-decoration-none text-dark fw-bold">← Volver</a>
+            <a href="/" class="text-decoration-none text-dark fw-bold"></a>
+        </div>
+    </nav>
+
+    <div id="toastNotification" class="toast-notification"></div>
+    <div id="contenidoDinamico">
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Cargando información del servicio...</p>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal fade confirm-modal" id="confirmacionModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0"><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><div class="confirm-icon"><i class="bi bi-check-circle-fill"></i></div><h4 class="fw-bold" id="confirmacionTitulo">¡Exito!</h4><p id="confirmacionMensaje" class="text-muted">Operación realizada correctamente</p><button type="button" class="btn btn-confirm mt-3" data-bs-dismiss="modal">Aceptar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="calificarModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title"><i class="bi bi-star-fill"></i> Calificar servicio</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body text-center">
+                    <p><strong id="calificarServicioTitulo"></strong></p>
+                    <p>¿Como calificas este servicio?</p>
+                    <div class="star-rating-modal" id="starRatingModal">
+                        <i class="bi bi-star" data-value="1"></i><i class="bi bi-star" data-value="2"></i>
+                        <i class="bi bi-star" data-value="3"></i><i class="bi bi-star" data-value="4"></i>
+                        <i class="bi bi-star" data-value="5"></i>
+                    </div>
+                    <textarea id="comentarioCalificacion" class="form-control mt-3" rows="2" placeholder="Deja un comentario (opcional)"></textarea>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="button" class="btn-enviar" id="enviarCalificacionBtn">Enviar calificación</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade enviar-mensaje-modal" id="enviarMensajeModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title"><i class="bi bi-chat-dots"></i> Enviar mensaje</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <div class="mb-3"><label class="form-label fw-bold">Para:</label><p id="destinatarioNombre" class="mb-2 text-primary">Usuario</p></div>
+                    <div class="mb-3"><label class="form-label fw-bold">Mensaje:</label><textarea id="mensajeTexto" class="form-control textarea-mensaje" rows="4" placeholder="Escribe tu mensaje..."></textarea></div>
+                </div>
+                <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="button" class="btn-enviar-mensaje" id="confirmarEnviarMsg">Enviar mensaje</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para postularse con CV -->
+    <div class="modal fade postular-modal" id="postularModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-send-check"></i> Postularme a este servicio</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Selecciona tu CV</label>
+                        <select id="cvSelect" class="cv-select">
+                            <option value="">Selecciona un CV...</option>
+                        </select>
+                        <small class="text-muted">Puedes subir tu CV en <a href="/micv">Mi CV</a></small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Mensaje (opcional)</label>
+                        <textarea id="postularMensaje" class="form-control" rows="3" placeholder="Escribe un mensaje para el empleador..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn-enviar-postulacion" id="confirmarPostulacionBtn">
+                        <i class="bi bi-send"></i> Enviar postulación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer-contact">
+        <div class="container text-center">
+            <p class="mb-2">¿Tienes sugerencias o comentarios?</p>
+            <a href="mailto:hop.casa@gmail.com?subject=Sugerencia%20para%20HOP" class="contact-link">
+                <i class="bi bi-envelope"></i> Envíanos tus sugerencias a hop.casa@gmail.com
+            </a>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_BASE = 'http://localhost:5147/api';
+        const STATIC_BASE = 'http://localhost:5147';
+        
+        const urlParts = window.location.pathname.split('/');
+        const servicioId = urlParts[urlParts.length - 1];
+        
+        const sesionActiva = localStorage.getItem('hop_session') === 'active';
+        const usuarioActual = JSON.parse(localStorage.getItem('hop_usuario') || 'null');
+        
+        let servicioActual = null;
+        let esPropietario = false;
+        let calificacionSeleccionada = 0;
+        let destinatarioActual = null;
+        let imagenesServicio = [];
+        let cvsDisponibles = [];
+
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            const toastDiv = document.getElementById('toastNotification');
+            toastDiv.innerHTML = `<div class="toast-${tipo}"><i class="bi ${tipo === 'success' ? 'bi-check-circle-fill' : (tipo === 'error' ? 'bi-x-circle-fill' : 'bi-exclamation-triangle-fill')}"></i>${mensaje}</div>`;
+            toastDiv.classList.add('show');
+            setTimeout(() => toastDiv.classList.remove('show'), 3000);
+        }
+
+        function mostrarModalConfirmacion(titulo, mensaje) {
+            document.getElementById('confirmacionTitulo').textContent = titulo;
+            document.getElementById('confirmacionMensaje').textContent = mensaje;
+            new bootstrap.Modal(document.getElementById('confirmacionModal')).show();
+        }
+
+        async function cargarImagenesServicio() {
+            try {
+                const response = await fetch(`${API_BASE}/Servicios/imagenes/${servicioId}`);
+                if (response.ok) {
+                    imagenesServicio = await response.json();
+                    console.log('Imágenes cargadas:', imagenesServicio);
+                } else {
+                    imagenesServicio = [];
+                }
+            } catch (error) { 
+                imagenesServicio = []; 
+            }
+        }
+
+        async function eliminarImagen(imagenId, imagenUrl, event) {
+            event.stopPropagation();
+            
+            if (confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
+                try {
+                    const response = await fetch(`${API_BASE}/Servicios/imagenes/${imagenId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        mostrarNotificacion('Imagen eliminada correctamente', 'success');
+                        // Recargar imágenes
+                        await cargarImagenesServicio();
+                        // Actualizar el carrusel y la galería
+                        actualizarCarrusel();
+                        actualizarGaleriaImagenes();
+                    } else {
+                        const error = await response.json();
+                        mostrarNotificacion(error.error || 'Error al eliminar imagen', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    mostrarNotificacion('Error al conectar con el servidor', 'error');
+                }
+            }
+        }
+
+        function actualizarCarrusel() {
+            const carouselElement = document.querySelector('#servicioCarousel');
+            if (carouselElement) {
+                const carousel = bootstrap.Carousel.getInstance(carouselElement);
+                if (carousel) carousel.dispose();
+                carouselElement.remove();
+            }
+            
+            const carouselContainer = document.querySelector('.servicio-carousel-container');
+            if (carouselContainer) {
+                carouselContainer.innerHTML = generarCarrusel();
+                const nuevoCarousel = document.querySelector('#servicioCarousel');
+                if (nuevoCarousel) {
+                    new bootstrap.Carousel(nuevoCarousel, { interval: 3000, wrap: true });
+                }
+            }
+        }
+
+        async function cargarCVs() {
+            try {
+                const response = await fetch(`${API_BASE}/Usuarios/mis-cvs/${usuarioActual.id}`);
+                if (response.ok) {
+                    cvsDisponibles = await response.json();
+                    const select = document.getElementById('cvSelect');
+                    if (select) {
+                        select.innerHTML = '<option value="">Selecciona un CV...</option>';
+                        cvsDisponibles.forEach(cv => {
+                            select.innerHTML += `<option value="${cv.id}">${cv.titulo || cv.nombreArchivo}</option>`;
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error cargando CVs:', error);
+                cvsDisponibles = [];
+            }
+        }
+
+        async function abrirModalPostulacion() {
+            if (!sesionActiva) {
+                mostrarNotificacion('Debes iniciar sesión para postularte', 'warning');
+                setTimeout(() => window.location.href = '/login', 1500);
+                return;
+            }
+            
+            await cargarCVs();
+            
+            if (cvsDisponibles.length === 0) {
+                const confirmar = confirm('No tienes CVs subidos. ¿Deseas subir uno ahora?');
+                if (confirmar) {
+                    window.location.href = '/micv';
+                }
+                return;
+            }
+            
+            document.getElementById('postularMensaje').value = '';
+            const modal = new bootstrap.Modal(document.getElementById('postularModal'));
+            modal.show();
+        }
+
+        async function enviarPostulacion() {
+            const cvId = document.getElementById('cvSelect').value;
+            if (!cvId) {
+                mostrarNotificacion('Selecciona un CV para postularte', 'warning');
+                return;
+            }
+            
+            const mensaje = document.getElementById('postularMensaje').value;
+            const btn = document.getElementById('confirmarPostulacionBtn');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Enviando...';
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append('servicioId', servicioActual.id);
+                formData.append('prestadorId', usuarioActual.id);
+                formData.append('mensaje', mensaje);
+                formData.append('cvId', cvId);
+                
+                const response = await fetch(`${API_BASE}/Postulaciones/aplicar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('postularModal')).hide();
+                    mostrarModalConfirmacion('¡Postulación enviada!', 'Tu postulación ha sido enviada correctamente');
+                } else {
+                    throw new Error(data.error || data.mensaje || 'Error al postularse');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send"></i> Enviar postulación';
+            }
+        }
+
+        function generarCarrusel() {
+            let imagenesUsar = [];
+            
+            if (imagenesServicio && imagenesServicio.length > 0) {
+                imagenesUsar = imagenesServicio;
+            } else if (servicioActual.imagenURL && servicioActual.imagenURL !== '/static/images/vacante.jpg') {
+                imagenesUsar = [{ imagenUrl: servicioActual.imagenURL }];
+            } else {
+                imagenesUsar = [{ imagenUrl: '/static/images/vacante.jpg' }];
+            }
+            
+            let itemsHtml = '';
+            imagenesUsar.forEach((img, idx) => {
+                let imgUrl = img.imagenUrl && img.imagenUrl.startsWith('http') ? img.imagenUrl : `${STATIC_BASE}${img.imagenUrl}`;
+                itemsHtml += `<div class="carousel-item ${idx === 0 ? 'active' : ''}">
+                                <img src="${imgUrl}" alt="Imagen ${idx + 1}" onerror="this.src='${STATIC_BASE}/static/images/vacante.jpg'">
+                              </div>`;
+            });
+            
+            let indicatorsHtml = '';
+            if (imagenesUsar.length > 1) {
+                imagenesUsar.forEach((_, idx) => {
+                    indicatorsHtml += `<button type="button" data-bs-target="#servicioCarousel" data-bs-slide-to="${idx}" class="${idx === 0 ? 'active' : ''}" aria-current="${idx === 0 ? 'true' : 'false'}"></button>`;
+                });
+            }
+            
+            return `
+                <div id="servicioCarousel" class="carousel slide servicio-carousel" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        ${itemsHtml}
+                    </div>
+                    ${imagenesUsar.length > 1 ? `
+                    <button class="carousel-control-prev" type="button" data-bs-target="#servicioCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#servicioCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Siguiente</span>
+                    </button>
+                    <div class="carousel-indicators">
+                        ${indicatorsHtml}
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function actualizarGaleriaImagenes() {
+            const previewContainer = document.getElementById('galeriaImagenesPreview');
+            if (!previewContainer) return;
+            
+            if (imagenesServicio && imagenesServicio.length > 0) {
+                previewContainer.innerHTML = imagenesServicio.map(img => {
+                    let imgUrl = img.imagenUrl.startsWith('http') ? img.imagenUrl : `${STATIC_BASE}${img.imagenUrl}`;
+                    return `
+                        <div class="imagen-item">
+                            <img src="${imgUrl}" alt="Imagen">
+                            <button class="btn-eliminar-img" onclick="eliminarImagen(${img.id}, '${img.imagenUrl}', event)" title="Eliminar imagen">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                previewContainer.innerHTML = '<p class="text-muted text-center">No hay imágenes adicionales</p>';
+            }
+        }
+
+        function actualizarGaleriaEnFormulario() {
+            if (imagenesServicio && imagenesServicio.length > 0) {
+                const galeriaContainer = document.getElementById('galeriaImagenesPreview');
+                if (galeriaContainer) {
+                    galeriaContainer.innerHTML = imagenesServicio.map(img => {
+                        let imgUrl = img.imagenUrl.startsWith('http') ? img.imagenUrl : `${STATIC_BASE}${img.imagenUrl}`;
+                        return `
+                            <div class="imagen-item">
+                                <img src="${imgUrl}" alt="Imagen">
+                                <button type="button" class="btn-eliminar-img" onclick="eliminarImagen(${img.id}, '${img.imagenUrl}', event)" title="Eliminar imagen">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            }
+        }
+
+        async function cargarServicio() {
+            const container = document.getElementById('contenidoDinamico');
+            container.innerHTML = '<div class="loading-spinner"><div class="spinner-border text-primary" role="status"></div><p>Cargando información del servicio...</p></div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/Servicios/buscar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Busqueda: "", CategoriaId: 0 })
+                });
+                
+                if (!response.ok) throw new Error('Error al cargar el servicio');
+                
+                const servicios = await response.json();
+                servicioActual = servicios.find(s => s.id == servicioId);
+                
+                if (!servicioActual) throw new Error('Servicio no encontrado');
+                
+                esPropietario = sesionActiva && usuarioActual && 
+                    (servicioActual.autor === usuarioActual.nombre || servicioActual.autor === usuarioActual.nombreCompleto);
+                
+                await cargarImagenesServicio();
+                mostrarDetalle();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                container.innerHTML = `<div class="container text-center py-5"><div class="alert alert-danger"><h5>Error al cargar el servicio</h5><p>${error.message}</p><a href="/" class="btn btn-primary">Volver al inicio</a></div></div>`;
+            }
+        }
+        
+        function mostrarModalEnviarMensaje() {
+            if (!sesionActiva) {
+                mostrarNotificacion('Debes iniciar sesión para enviar mensajes', 'warning');
+                setTimeout(() => window.location.href = '/login', 1500);
+                return;
+            }
+            destinatarioActual = { id: servicioActual.autorId, nombre: servicioActual.autor };
+            document.getElementById('destinatarioNombre').innerHTML = `<strong>${escapeHtml(servicioActual.autor)}</strong>`;
+            document.getElementById('mensajeTexto').value = '';
+            new bootstrap.Modal(document.getElementById('enviarMensajeModal')).show();
+        }
+
+        async function enviarMensajeModal() {
+            const mensaje = document.getElementById('mensajeTexto').value.trim();
+            if (!mensaje) {
+                mostrarNotificacion('Escribe un mensaje', 'warning');
+                return;
+            }
+            try {
+                const formData = new URLSearchParams();
+                formData.append('emisorId', usuarioActual.id);
+                formData.append('receptorId', destinatarioActual.id);
+                formData.append('mensaje', mensaje);
+                const response = await fetch(`${API_BASE}/Chat/enviar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('enviarMensajeModal')).hide();
+                    mostrarModalConfirmacion('¡Mensaje enviado!', 'Tu mensaje se ha enviado correctamente');
+                } else throw new Error('Error al enviar');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al enviar el mensaje', 'error');
+            }
+        }
+
+        async function enviarMensaje() { mostrarModalEnviarMensaje(); }
+
+        function abrirCalificar() {
+            if (!sesionActiva) {
+                mostrarNotificacion('Debes iniciar sesión para calificar', 'warning');
+                setTimeout(() => window.location.href = '/login', 1500);
+                return;
+            }
+            document.getElementById('calificarServicioTitulo').textContent = servicioActual.titulo;
+            calificacionSeleccionada = 0;
+            const stars = document.querySelectorAll('#starRatingModal i');
+            stars.forEach(star => { star.className = 'bi bi-star'; star.style.color = '#ddd'; });
+            document.getElementById('comentarioCalificacion').value = '';
+            new bootstrap.Modal(document.getElementById('calificarModal')).show();
+        }
+
+        function setupStarRating() {
+            const stars = document.querySelectorAll('#starRatingModal i');
+            stars.forEach(star => {
+                star.removeEventListener('mouseenter', star._mouseEnterHandler);
+                star.removeEventListener('click', star._clickHandler);
+                star._mouseEnterHandler = function() {
+                    const val = parseInt(this.dataset.value);
+                    stars.forEach((s, idx) => {
+                        if (idx < val) { s.className = 'bi bi-star-fill'; s.style.color = '#ffc107'; }
+                        else { s.className = 'bi bi-star'; s.style.color = '#ddd'; }
+                    });
+                };
+                star._clickHandler = function() { calificacionSeleccionada = parseInt(this.dataset.value); };
+                star.addEventListener('mouseenter', star._mouseEnterHandler);
+                star.addEventListener('click', star._clickHandler);
+            });
+        }
+
+        async function enviarCalificacion() {
+            if (calificacionSeleccionada === 0) {
+                mostrarNotificacion('Selecciona una calificación de 1 a 5 estrellas', 'warning');
+                return;
+            }
+            const comentario = document.getElementById('comentarioCalificacion').value;
+            try {
+                const formData = new URLSearchParams();
+                formData.append('servicioId', servicioActual.id);
+                formData.append('calificadorId', usuarioActual.id);
+                formData.append('calificadoId', servicioActual.autorId);
+                formData.append('puntuacion', calificacionSeleccionada);
+                formData.append('comentario', comentario);
+                const response = await fetch(`${API_BASE}/Calificaciones/crear`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                if (response.ok) {
+                    bootstrap.Modal.getInstance(document.getElementById('calificarModal')).hide();
+                    mostrarModalConfirmacion('¡Calificación enviada!', 'Gracias por calificar este servicio');
+                } else throw new Error('Error al enviar calificación');
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al enviar la calificación', 'error');
+            }
+        }
+        
+        function mostrarDetalle() {
+            const container = document.getElementById('contenidoDinamico');
+            
+            const contenido = `
+                <div class="servicio-carousel-container">
+                    ${generarCarrusel()}
+                </div>
+
+                <div class="info-header">
+                    <div class="container text-center">
+                        <h1 class="display-5 fw-bold">${escapeHtml(servicioActual.titulo)}</h1>
+                        <div class="d-flex justify-content-center gap-3 mt-3 flex-wrap">
+                            <span class="badge-custom">📍 ${escapeHtml(servicioActual.ubicacion)}</span>
+                            <span class="badge-custom">🏷️ ${escapeHtml(servicioActual.categoria)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container mb-5">
+                    <div class="row justify-content-center">
+                        <div class="col-md-8">
+                            <div class="action-card">
+                                <h4 class="fw-bold mb-3">Descripción</h4>
+                                <p class="text-muted">${escapeHtml(servicioActual.descripcion) || 'Sin descripción disponible'}</p>
+                                
+                                <div class="row mt-4 g-3">
+                                    <div class="col-6">
+                                        <div class="info-box">
+                                            <h6 class="text-muted mb-1">Publicado por</h6>
+                                            <p class="fw-bold mb-0">${escapeHtml(servicioActual.autor)}</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="info-box">
+                                            <h6 class="text-muted mb-1">Fecha de publicación</h6>
+                                            <p class="fw-bold mb-0">${new Date(servicioActual.fechaRegistro).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid gap-3 mt-4">
+                                    ${!esPropietario ? `
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-hop flex-grow-1" onclick="abrirModalPostulacion()">Postularme a este servicio</button>
+                                            <button class="btn-chat" onclick="enviarMensaje()">Mensaje</button>
+                                            <button class="btn-calificar" onclick="abrirCalificar()">Calificar</button>
+                                        </div>
+                                    ` : `
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-edit flex-grow-1" onclick="mostrarFormularioEdicion()">Editar mi servicio</button>
+                                        </div>
+                                    `}
+                                    
+                                    <div id="editForm" class="edit-form">
+                                        <h5 class="fw-bold mb-3">Editar Servicio</h5>
+                                        <form id="editarServicioForm" enctype="multipart/form-data">
+                                            <div class="mb-3">
+                                                <label class="form-label">Título</label>
+                                                <input type="text" class="form-control" id="editTitulo" value="${escapeHtml(servicioActual.titulo)}" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Descripción</label>
+                                                <textarea class="form-control" id="editDescripcion" rows="3" required>${escapeHtml(servicioActual.descripcion || '')}</textarea>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Ubicación</label>
+                                                <select class="form-select" id="editUbicacion" required>
+                                                    <option value="Los Mochis" ${servicioActual.ubicacion === 'Los Mochis' ? 'selected' : ''}>Los Mochis, Sinaloa</option>
+                                                    <option value="Guamuchil" ${servicioActual.ubicacion === 'Guamuchil' ? 'selected' : ''}>Guamuchil, Sinaloa</option>
+                                                    <option value="Culiacan" ${servicioActual.ubicacion === 'Culiacan' ? 'selected' : ''}>Culiacan, Sinaloa</option>
+                                                    <option value="Mazatlan" ${servicioActual.ubicacion === 'Mazatlan' ? 'selected' : ''}>Mazatlan, Sinaloa</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Categoría</label>
+                                                <select class="form-select" id="editCategoriaID" required>
+                                                    <option value="1">Construcción</option><option value="2">Plomería</option><option value="3">Electricidad</option>
+                                                    <option value="4">Jardinería</option><option value="5">Pintura</option><option value="6">Mecánica</option>
+                                                    <option value="7">Carpintería</option><option value="8">Limpieza</option><option value="9">Mudanzas</option>
+                                                    <option value="10">Cocina</option><option value="11">Fotografía</option><option value="12">Clases</option>
+                                                    <option value="13">Tecnología</option><option value="14">Cuidado Personal</option><option value="15">Cuidado de Adultos</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Galería de imágenes</label>
+                                                <div id="galeriaImagenesPreview" class="galeria-preview">
+                                                    ${imagenesServicio.length > 0 ? imagenesServicio.map(img => {
+                                                        let imgUrl = img.imagenUrl.startsWith('http') ? img.imagenUrl : `${STATIC_BASE}${img.imagenUrl}`;
+                                                        return `
+                                                            <div class="imagen-item">
+                                                                <img src="${imgUrl}" alt="Imagen">
+                                                                <button type="button" class="btn-eliminar-img" onclick="eliminarImagen(${img.id}, '${img.imagenUrl}', event)" title="Eliminar imagen">
+                                                                    <i class="bi bi-x"></i>
+                                                                </button>
+                                                            </div>
+                                                        `;
+                                                    }).join('') : '<p class="text-muted text-center">No hay imágenes adicionales</p>'}
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Agregar nuevas imágenes</label>
+                                                <div class="upload-area" onclick="document.getElementById('editImagenes').click()">
+                                                    <i class="bi bi-images" style="font-size: 2rem; color: #999;"></i>
+                                                    <p class="text-muted mb-0">Haz clic para seleccionar múltiples imágenes</p>
+                                                    <small class="text-muted">Formatos: JPG, PNG, GIF (máx. 2MB c/u)</small>
+                                                </div>
+                                                <input type="file" id="editImagenes" name="imagenes" accept="image/*" multiple style="display: none;" onchange="subirNuevasImagenes(event)">
+                                                <div id="nuevasImagenesPreview" class="galeria-preview"></div>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button type="submit" class="btn btn-hop">Guardar cambios</button>
+                                                <button type="button" class="btn btn-secondary" onclick="ocultarFormularioEdicion()">Cancelar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    
+                                    <a href="/" class="btn-volver text-center">Volver al inicio</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = contenido;
+            
+            const carouselElement = document.querySelector('#servicioCarousel');
+            if (carouselElement) {
+                new bootstrap.Carousel(carouselElement, { interval: 3000, wrap: true });
+            }
+        }
+        
+        let nuevasImagenes = [];
+        
+        function subirNuevasImagenes(event) {
+            const files = event.target.files;
+            const previewContainer = document.getElementById('nuevasImagenesPreview');
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('image/')) {
+                    mostrarNotificacion(`El archivo ${file.name} no es una imagen`, 'warning');
+                    continue;
+                }
+                if (file.size > 2 * 1024 * 1024) {
+                    mostrarNotificacion(`La imagen ${file.name} supera los 2MB`, 'warning');
+                    continue;
+                }
+                
+                nuevasImagenes.push(file);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'imagen-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <button type="button" class="btn-eliminar-img" onclick="this.parentElement.remove(); nuevasImagenes.splice(${nuevasImagenes.indexOf(file)}, 1)" title="Eliminar">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    `;
+                    previewContainer.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function mostrarFormularioEdicion() {
+            document.getElementById('editForm').classList.add('show');
+            document.getElementById('editForm').scrollIntoView({ behavior: 'smooth' });
+            const form = document.getElementById('editarServicioForm');
+            form.removeEventListener('submit', handleSubmit);
+            form.addEventListener('submit', handleSubmit);
+        }
+        
+        async function handleSubmit(e) {
+            e.preventDefault();
+            await guardarCambios();
+        }
+        
+        function ocultarFormularioEdicion() { document.getElementById('editForm').classList.remove('show'); }
+        
+        async function guardarCambios() {
+            const nuevoTitulo = document.getElementById('editTitulo').value;
+            const nuevaDescripcion = document.getElementById('editDescripcion').value;
+            const nuevaUbicacion = document.getElementById('editUbicacion').value;
+            const nuevaCategoriaID = document.getElementById('editCategoriaID').value;
+            
+            const formData = new FormData();
+            formData.append('id', servicioActual.id);
+            formData.append('Titulo', nuevoTitulo);
+            formData.append('Descripcion', nuevaDescripcion);
+            formData.append('Ubicacion', nuevaUbicacion);
+            formData.append('CategoriaId', nuevaCategoriaID);
+            
+            try {
+                const response = await fetch(`${API_BASE}/Servicios/actualizar`, { method: 'PUT', body: formData });
+                if (!response.ok) throw new Error((await response.json()).error || 'Error al actualizar');
+                
+                if (nuevasImagenes.length > 0) {
+                    const imagenesFormData = new FormData();
+                    for (let i = 0; i < nuevasImagenes.length; i++) {
+                        imagenesFormData.append('imagenes', nuevasImagenes[i]);
+                    }
+                    
+                    const imagenesResponse = await fetch(`${API_BASE}/Servicios/subir-imagenes/${servicioActual.id}`, {
+                        method: 'POST',
+                        body: imagenesFormData
+                    });
+                    
+                    if (!imagenesResponse.ok) {
+                        mostrarNotificacion('Servicio actualizado pero algunas imágenes no se subieron', 'warning');
+                    }
+                }
+                
+                mostrarModalConfirmacion('¡Servicio actualizado!', 'Los cambios se han guardado correctamente');
+                setTimeout(() => window.location.reload(), 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al actualizar el servicio', 'error');
+            }
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        document.getElementById('enviarCalificacionBtn')?.addEventListener('click', enviarCalificacion);
+        document.getElementById('confirmarEnviarMsg')?.addEventListener('click', enviarMensajeModal);
+        document.getElementById('confirmarPostulacionBtn')?.addEventListener('click', enviarPostulacion);
+        
+        window.enviarMensaje = enviarMensaje;
+        window.abrirCalificar = abrirCalificar;
+        window.abrirModalPostulacion = abrirModalPostulacion;
+        window.mostrarFormularioEdicion = mostrarFormularioEdicion;
+        window.ocultarFormularioEdicion = ocultarFormularioEdicion;
+        window.eliminarImagen = eliminarImagen;
+        
+        cargarServicio();
+        setupStarRating();
+    </script>
+</body>
+</html>
